@@ -96,9 +96,13 @@ export default function FindComplementScreen() {
   };
 
   // Helper to render each square item
-  const renderItemSquare = (item: ClothingItem, label: string) => (
+  const renderItemSquare = (item: ClothingItem, label: string, disabled: boolean = false) => (
     <View style={styles.squareContainer}>
-      <TouchableOpacity style={styles.square} onPress={() => pickImage(item)}>
+      <TouchableOpacity
+        style={[styles.square, disabled && styles.disabledSquare]}
+        onPress={() => !disabled && pickImage(item)}
+        disabled={disabled}
+      >
         {images[item] ? (
           <>
             <Image source={{ uri: images[item]! }} style={styles.image} />
@@ -110,7 +114,9 @@ export default function FindComplementScreen() {
             </TouchableOpacity>
           </>
         ) : (
-          <Text style={styles.label}>{label}</Text>
+          <Text style={[styles.label, disabled && styles.disabledLabel]}>
+            {label}
+          </Text>
         )}
       </TouchableOpacity>
     </View>
@@ -127,9 +133,9 @@ export default function FindComplementScreen() {
 
           <View style={styles.grid}>
             {renderItemSquare('top', 'Top')}
-            {renderItemSquare('trousers', 'Trousers')}
-            {renderItemSquare('shorts', 'Shorts')}
-            {renderItemSquare('skirt', 'Skirt')}
+            {renderItemSquare('trousers', 'Trousers', !!images['skirt'] || !!images['shorts'])}
+            {renderItemSquare('shorts', 'Shorts', !!images['skirt'] || !!images['trousers'])}
+            {renderItemSquare('skirt', 'Skirt', !!images['trousers'] || !!images['shorts'])}
             {renderItemSquare('shoes', 'Shoes')}
             <View style={styles.squareInvisible} />
           </View>
@@ -238,5 +244,13 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 14,
+  },
+  disabledSquare: {
+    backgroundColor: '#ccc',
+    opacity: 0.6,
+  },
+  
+  disabledLabel: {
+    color: '#999',
   },
 });
