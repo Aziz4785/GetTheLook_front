@@ -164,11 +164,11 @@ export default function FindComplementScreen() {
           <Text style={styles.title}>Select the Items you have :</Text>
 
           <View style={styles.grid}>
-            {renderItemSquare('top', 'Top', categorySelected.top || (selectedCategoryCount >= 2 && !categorySelected.top))}
+            {renderItemSquare('top', 'Top', selectedCategoryCount >= 2 && !categorySelected.top)}
             {renderItemSquare('trousers', 'Trousers', categorySelected.bottom || (selectedCategoryCount >= 2 && !categorySelected.bottom))}
             {renderItemSquare('shorts', 'Shorts', categorySelected.bottom || (selectedCategoryCount >= 2 && !categorySelected.bottom))}
             {renderItemSquare('skirt', 'Skirt', categorySelected.bottom || (selectedCategoryCount >= 2 && !categorySelected.bottom))}
-            {renderItemSquare('shoes', 'Shoes', categorySelected.shoes || (selectedCategoryCount >= 2 && !categorySelected.shoes))}
+            {renderItemSquare('shoes', 'Shoes', selectedCategoryCount >= 2 && !categorySelected.shoes)}
             <View style={styles.squareInvisible} />
           </View>
 
