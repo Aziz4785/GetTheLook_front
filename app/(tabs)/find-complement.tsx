@@ -91,17 +91,29 @@ export default function FindComplementScreen() {
     Alert.alert('Submitted', 'Images submitted (check console log).');
   };
 
+  const clearImage = (item: ClothingItem) => {
+    setImages((prev) => ({ ...prev, [item]: null }));
+  };
+
   // Helper to render each square item
   const renderItemSquare = (item: ClothingItem, label: string) => (
-    <TouchableOpacity style={styles.square} onPress={() => pickImage(item)}>
-      {images[item] ? (
-        <Image source={{ uri: images[item]! }} style={styles.image} />
-      ) : (
-        // Replace this Text with your SVG component later
-        <Text style={styles.label}>{label}</Text>
-        // Example: <YourSvgIconComponent width={50} height={50} />
-      )}
-    </TouchableOpacity>
+    <View style={styles.squareContainer}>
+      <TouchableOpacity style={styles.square} onPress={() => pickImage(item)}>
+        {images[item] ? (
+          <>
+            <Image source={{ uri: images[item]! }} style={styles.image} />
+            <TouchableOpacity
+              style={styles.clearButton}
+              onPress={() => clearImage(item)}
+            >
+              <Text style={styles.clearButtonText}>✕</Text>
+            </TouchableOpacity>
+          </>
+        ) : (
+          <Text style={styles.label}>{label}</Text>
+        )}
+      </TouchableOpacity>
+    </View>
   );
 
   return (
@@ -204,5 +216,27 @@ const styles = StyleSheet.create({
   selectionContainer: {
     marginBottom: 20,
     paddingHorizontal: 10,
+  },
+  squareContainer: {
+    position: 'relative',
+  },
+  
+  clearButton: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    borderRadius: 12,
+    width: 24,
+    height: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
+  },
+  
+  clearButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 14,
   },
 });
