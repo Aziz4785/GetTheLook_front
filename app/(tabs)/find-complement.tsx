@@ -101,6 +101,18 @@ export default function FindComplementScreen() {
   // For bottom wear, if any of 'trousers', 'shorts', or 'skirt' is uploaded, exclude all three
   const hasBottom = ['trousers', 'shorts', 'skirt'].some((item) => uploadedItems.includes(item));
 
+  const isBottomCategory = (item: ClothingItem) =>
+    ['trousers', 'shorts', 'skirt'].includes(item);
+  
+  // Check which categories have been selected
+  const categorySelected = {
+    top: !!images['top'],
+    bottom: (['trousers', 'shorts', 'skirt'] as ClothingItem[]).some((item) => !!images[item]),
+    shoes: !!images['shoes'],
+  };
+  // Count how many distinct categories have been selected
+  const selectedCategoryCount = Object.values(categorySelected).filter(Boolean).length;
+
   const availableOptions = [
     { label: 'Top', value: 'top' as ClothingItem },
     { label: 'Trousers', value: 'trousers' as ClothingItem },
@@ -108,9 +120,10 @@ export default function FindComplementScreen() {
     { label: 'Skirt', value: 'skirt' as ClothingItem },
     { label: 'Shoes', value: 'shoes' as ClothingItem },
   ].filter(option => {
-    if (option.value === 'top' && uploadedItems.includes('top')) return false;
-    if (['trousers', 'shorts', 'skirt'].includes(option.value) && hasBottom) return false;
-    if (option.value === 'shoes' && uploadedItems.includes('shoes')) return false;
+    const val = option.value;
+    if (val === 'top') return !categorySelected.top;
+    if (val === 'shoes') return !categorySelected.shoes;
+    if (isBottomCategory(val)) return !categorySelected.bottom;
     return true;
   });
   
@@ -151,11 +164,11 @@ export default function FindComplementScreen() {
           <Text style={styles.title}>Select the Items you have :</Text>
 
           <View style={styles.grid}>
-            {renderItemSquare('top', 'Top')}
-            {renderItemSquare('trousers', 'Trousers', !!images['skirt'] || !!images['shorts'])}
-            {renderItemSquare('shorts', 'Shorts', !!images['skirt'] || !!images['trousers'])}
-            {renderItemSquare('skirt', 'Skirt', !!images['trousers'] || !!images['shorts'])}
-            {renderItemSquare('shoes', 'Shoes')}
+            {renderItemSquare('top', 'Top', categorySelected.top || (selectedCategoryCount >= 2 && !categorySelected.top))}
+            {renderItemSquare('trousers', 'Trousers', categorySelected.bottom || (selectedCategoryCount >= 2 && !categorySelected.bottom))}
+            {renderItemSquare('shorts', 'Shorts', categorySelected.bottom || (selectedCategoryCount >= 2 && !categorySelected.bottom))}
+            {renderItemSquare('skirt', 'Skirt', categorySelected.bottom || (selectedCategoryCount >= 2 && !categorySelected.bottom))}
+            {renderItemSquare('shoes', 'Shoes', categorySelected.shoes || (selectedCategoryCount >= 2 && !categorySelected.shoes))}
             <View style={styles.squareInvisible} />
           </View>
 
