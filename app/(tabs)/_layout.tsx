@@ -40,6 +40,14 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
         }}
       />
+      <Tabs.Screen
+        name="find-complement"
+        options={{
+          // Hide the tab button
+          tabBarButton: () => null,
+          title: 'Find Complement',
+        }}
+      />
     </Tabs>
   );
 }

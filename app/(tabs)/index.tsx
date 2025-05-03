@@ -1,9 +1,10 @@
 import { Image } from 'expo-image';
+import { useRouter } from 'expo-router';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 
-
 export default function HomeScreen() {
+  const router = useRouter();
   return (
     <View style={styles.container}>
       <View style={styles.buttonRow}>
@@ -12,6 +13,7 @@ export default function HomeScreen() {
           imageSource={require('@/assets/images/tshirt.svg')}
           onPress={() => {
             // handle navigation or action
+            router.push('/(tabs)/find-complement')
           }}
         />
         <MenuButton
