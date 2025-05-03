@@ -91,10 +91,29 @@ export default function FindComplementScreen() {
     Alert.alert('Submitted', 'Images submitted (check console log).');
   };
 
+  // Determine which items have already been selected (uploaded)
   const clearImage = (item: ClothingItem) => {
     setImages((prev) => ({ ...prev, [item]: null }));
   };
 
+  const uploadedItems = Object.keys(images).filter((key) => images[key as ClothingItem]);
+
+  // For bottom wear, if any of 'trousers', 'shorts', or 'skirt' is uploaded, exclude all three
+  const hasBottom = ['trousers', 'shorts', 'skirt'].some((item) => uploadedItems.includes(item));
+
+  const availableOptions = [
+    { label: 'Top', value: 'top' as ClothingItem },
+    { label: 'Trousers', value: 'trousers' as ClothingItem },
+    { label: 'Shorts', value: 'shorts' as ClothingItem },
+    { label: 'Skirt', value: 'skirt' as ClothingItem },
+    { label: 'Shoes', value: 'shoes' as ClothingItem },
+  ].filter(option => {
+    if (option.value === 'top' && uploadedItems.includes('top')) return false;
+    if (['trousers', 'shorts', 'skirt'].includes(option.value) && hasBottom) return false;
+    if (option.value === 'shoes' && uploadedItems.includes('shoes')) return false;
+    return true;
+  });
+  
   // Helper to render each square item
   const renderItemSquare = (item: ClothingItem, label: string, disabled: boolean = false) => (
     <View style={styles.squareContainer}>
@@ -105,7 +124,7 @@ export default function FindComplementScreen() {
       >
         {images[item] ? (
           <>
-            <Image source={{ uri: images[item]! }} style={styles.image} />
+            <Image source={{ uri: images[item]! }} style={styles.image} resizeMode="cover" />
             <TouchableOpacity
               style={styles.clearButton}
               onPress={() => clearImage(item)}
@@ -140,19 +159,17 @@ export default function FindComplementScreen() {
             <View style={styles.squareInvisible} />
           </View>
 
-          <Text style={styles.subTitle}>Select the item you are looking for :</Text>
+          <Text style={styles.title}>Select the item you are looking for :</Text>
 
           <View style={styles.selectionContainer}>
-            <Picker
-              selectedValue={selectedItem}
-              onValueChange={(itemValue) => setSelectedItem(itemValue)}
-            >
-              <Picker.Item label="Top" value="top" />
-              <Picker.Item label="Trousers" value="trousers" />
-              <Picker.Item label="Shorts" value="shorts" />
-              <Picker.Item label="Skirt" value="skirt" />
-              <Picker.Item label="Shoes" value="shoes" />
-            </Picker>
+          <Picker
+            selectedValue={selectedItem}
+            onValueChange={(itemValue) => setSelectedItem(itemValue)}
+          >
+            {availableOptions.map(option => (
+              <Picker.Item key={option.value} label={option.label} value={option.value} />
+            ))}
+          </Picker>
           </View>
 
           <View style={styles.buttonContainer}>
@@ -185,6 +202,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     gap: 15,
+    marginBottom: 40,
   },
   square: {
     width: 100,
