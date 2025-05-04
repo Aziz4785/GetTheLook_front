@@ -1,6 +1,6 @@
 import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Alert, Button, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 // Comments mapping item types to suggested SVG names (from previous context)
 // Top: tshirt.svg
@@ -40,6 +40,7 @@ export default function FindComplementScreen() {
     shoes: null,
   });
 
+  
   // Function to handle picking an image
   const pickImage = async (item: ClothingItem) => {
     // Request permissions
@@ -107,9 +108,36 @@ export default function FindComplementScreen() {
 
   // Function to handle submission
   const handleSubmit = () => {
-    console.log('Selected Images:', images);
+    // Create the request object
+    const request: Record<string, string> = {};
+    
+    //print selectedItem
+    console.log('Selected Target Item:', selectedItem);
+    
+    // Add all uploaded images except the selected item
+    Object.entries(images).forEach(([key, value]) => {
+      console.log(`Checking image: key=${key}, value=${value ? '[exists]' : 'null/undefined'}`);
+      if (value && key !== selectedItem) {
+        console.log(`--> Added to request: key=${key}`);
+        request[key] = value;
+      }
+      else{
+        console.log(`--> Skipped: key=${key}`);
+      }
+    });
+    console.log('=== SUBMISSION DEBUG ===');
+    console.log('Selected Target Item:', selectedItem);
+    console.log('Filtered Input Images:', request);
+    console.log('Raw Images Object:', images);
+    console.log('========================');
+    // Log the request for debugging
+    console.log('Request:', {
+      target: selectedItem,
+      inputs: request
+    });
+
     // Add your submission logic here (e.g., send to backend)
-    Alert.alert('Submitted', 'Images submitted (check console log).');
+    Alert.alert('Submitted', 'Images submitted successfully.');
   };
 
   // Determine which items have already been selected (uploaded)
@@ -148,6 +176,15 @@ export default function FindComplementScreen() {
     return true;
   });
   
+  useEffect(() => {
+    if (!availableOptions.find(option => option.value === selectedItem)) {
+      // Set selectedItem to the first available option if the current one is not valid
+      if (availableOptions.length > 0) {
+        setSelectedItem(availableOptions[0].value);
+      }
+    }
+  }, [availableOptions, selectedItem]);
+
   // Helper to render each square item
   const renderItemSquare = (item: ClothingItem, label: string, disabled: boolean = false) => {
     const IconComponent = itemIcons[item];
