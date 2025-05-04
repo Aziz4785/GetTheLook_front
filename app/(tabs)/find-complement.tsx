@@ -107,39 +107,70 @@ export default function FindComplementScreen() {
   };
 
   // Function to handle submission
-  const handleSubmit = () => {
-    // Create the request object
-    const request: Record<string, string> = {};
+  // const handleSubmit = () => {
+  //   // Create the request object
+  //   const request: Record<string, string> = {};
     
-    //print selectedItem
-    console.log('Selected Target Item:', selectedItem);
+  //   //print selectedItem
+  //   console.log('Selected Target Item:', selectedItem);
     
-    // Add all uploaded images except the selected item
+  //   // Add all uploaded images except the selected item
+  //   Object.entries(images).forEach(([key, value]) => {
+  //     console.log(`Checking image: key=${key}, value=${value ? '[exists]' : 'null/undefined'}`);
+  //     if (value && key !== selectedItem) {
+  //       console.log(`--> Added to request: key=${key}`);
+  //       request[key] = value;
+  //     }
+  //     else{
+  //       console.log(`--> Skipped: key=${key}`);
+  //     }
+  //   });
+  //   console.log('=== SUBMISSION DEBUG ===');
+  //   console.log('Selected Target Item:', selectedItem);
+  //   console.log('Filtered Input Images:', request);
+  //   console.log('Raw Images Object:', images);
+  //   console.log('========================');
+  //   // Log the request for debugging
+  //   console.log('Request:', {
+  //     target: selectedItem,
+  //     inputs: request
+  //   });
+
+  //   // Add your submission logic here (e.g., send to backend)
+  //   Alert.alert('Submitted', 'Images submitted successfully.');
+  // };
+  const handleSubmit = async () => {
+    const formData = new FormData();
+  
+    // Add each image except the selected one
     Object.entries(images).forEach(([key, value]) => {
-      console.log(`Checking image: key=${key}, value=${value ? '[exists]' : 'null/undefined'}`);
       if (value && key !== selectedItem) {
-        console.log(`--> Added to request: key=${key}`);
-        request[key] = value;
-      }
-      else{
-        console.log(`--> Skipped: key=${key}`);
+        formData.append(key, {
+          uri: value, // use value directly, not value.uri
+          name: `${key}.png`,
+          type: 'image/png',
+        } as any); // 'as any' to satisfy TypeScript for React Native FormData
       }
     });
-    console.log('=== SUBMISSION DEBUG ===');
-    console.log('Selected Target Item:', selectedItem);
-    console.log('Filtered Input Images:', request);
-    console.log('Raw Images Object:', images);
-    console.log('========================');
-    // Log the request for debugging
-    console.log('Request:', {
-      target: selectedItem,
-      inputs: request
-    });
-
-    // Add your submission logic here (e.g., send to backend)
-    Alert.alert('Submitted', 'Images submitted successfully.');
+    //Add selectedItem to the formData
+    formData.append('target', selectedItem);
+    console.log('Form Data:', formData);
+    try {
+      console.log('Sending request...');
+      const response = await fetch('http://192.168.1.10:8000/recommend', {
+        method: 'POST',
+        body: formData, // Only this
+      });
+      console.log('Request sent, awaiting response...');
+      const data = await response.json();
+      console.log('Server response:', data);
+  
+      Alert.alert('Recommendations', JSON.stringify(data.recommendations, null, 2));
+    } catch (error) {
+      console.error('Error sending request:', error);
+      Alert.alert('Error', 'Failed to send request to the server.');
+    }
   };
-
   // Determine which items have already been selected (uploaded)
   const clearImage = (item: ClothingItem) => {
     setImages((prev) => ({ ...prev, [item]: null }));
