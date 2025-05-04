@@ -8,7 +8,11 @@ import { Alert, Button, Image, SafeAreaView, ScrollView, StyleSheet, Text, Touch
 // Shorts: shorts.svg
 // Skirt: skirt.svg
 // Shoes: shoes.svg
-
+import PantsIcon from '../../assets/icons/pants.svg';
+import ShoesIcon from '../../assets/icons/shoes.svg';
+import ShortsIcon from '../../assets/icons/shorts.svg';
+import SkirtIcon from '../../assets/icons/skirt.svg';
+import TshirtIcon from '../../assets/icons/tshirt.svg';
 // Interface for the image state
 interface ClothingImages {
   top: string | null;
@@ -17,7 +21,13 @@ interface ClothingImages {
   skirt: string | null;
   shoes: string | null;
 }
-
+const itemIcons: Record<ClothingItem, React.ComponentType<any>> = {
+  top: TshirtIcon,
+  trousers: PantsIcon,
+  shorts: ShortsIcon,
+  skirt: SkirtIcon,
+  shoes: ShoesIcon,
+};
 type ClothingItem = keyof ClothingImages;
 
 export default function FindComplementScreen() {
@@ -128,31 +138,35 @@ export default function FindComplementScreen() {
   });
   
   // Helper to render each square item
-  const renderItemSquare = (item: ClothingItem, label: string, disabled: boolean = false) => (
-    <View style={styles.squareContainer}>
-      <TouchableOpacity
-        style={[styles.square, disabled && styles.disabledSquare]}
-        onPress={() => !disabled && pickImage(item)}
-        disabled={disabled}
-      >
-        {images[item] ? (
-          <>
-            <Image source={{ uri: images[item]! }} style={styles.image} resizeMode="cover" />
-            <TouchableOpacity
-              style={styles.clearButton}
-              onPress={() => clearImage(item)}
-            >
-              <Text style={styles.clearButtonText}>✕</Text>
-            </TouchableOpacity>
-          </>
-        ) : (
-          <Text style={[styles.label, disabled && styles.disabledLabel]}>
-            {label}
-          </Text>
-        )}
-      </TouchableOpacity>
-    </View>
-  );
+  const renderItemSquare = (item: ClothingItem, label: string, disabled: boolean = false) => {
+    const IconComponent = itemIcons[item];
+    return (
+      <View style={styles.squareContainer}>
+        <TouchableOpacity
+          style={[styles.square, disabled && styles.disabledSquare]}
+          onPress={() => !disabled && pickImage(item)}
+          disabled={disabled}
+        >
+          {images[item] ? (
+            <>
+              <Image source={{ uri: images[item]! }} style={styles.image} resizeMode="cover" />
+              <TouchableOpacity
+                style={styles.clearButton}
+                onPress={() => clearImage(item)}
+              >
+                <Text style={styles.clearButtonText}>✕</Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            IconComponent && <IconComponent width={48} height={48} fill={disabled ? "#999" : "#555"} />
+          )}
+        </TouchableOpacity>
+        <Text style={[styles.label, disabled && styles.disabledLabel, { textAlign: 'center', marginTop: 6 }]}>
+          {label}
+        </Text>
+      </View>
+    );
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}> 

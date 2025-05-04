@@ -1,16 +1,20 @@
-import { Image } from 'expo-image';
+import HangerIcon from '@/assets/images/hanger.svg';
+import SearchIcon from '@/assets/images/search.svg';
+import TshirtIcon from '@/assets/images/tshirt.svg';
 import { useRouter } from 'expo-router';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SvgProps } from 'react-native-svg';
 
 
 export default function HomeScreen() {
   const router = useRouter();
   return (
     <View style={styles.container}>
+      <Text style={styles.appName}>Get The Look</Text>
       <View style={styles.buttonRow}>
         <MenuButton
           title="Find a Complement"
-          imageSource={require('@/assets/images/tshirt.svg')}
+          Icon={TshirtIcon}
           onPress={() => {
             // handle navigation or action
             router.push('/(tabs)/find-complement')
@@ -18,14 +22,14 @@ export default function HomeScreen() {
         />
         <MenuButton
           title="Wardrobe Wizard"
-          imageSource={require('@/assets/images/hanger.svg')}
+          Icon={HangerIcon}
           onPress={() => {
             // handle navigation or action
           }}
         />
         <MenuButton
           title="Smart Search"
-          imageSource={require('@/assets/images/search.svg')}
+          Icon={SearchIcon}
           onPress={() => {
             // handle navigation or action
           }}
@@ -35,11 +39,21 @@ export default function HomeScreen() {
   );
 }
 
-function MenuButton({ title, imageSource, onPress }) {
+type MenuButtonProps = {
+  title: string;
+  Icon: React.FC<SvgProps>;
+  onPress: () => void;
+};
+
+function MenuButton({ title, Icon, onPress }: MenuButtonProps) {
   return (
     <View style={styles.menuButtonContainer}>
-      <TouchableOpacity style={styles.menuButton} onPress={onPress} activeOpacity={0.7}>
-        <Image source={imageSource} style={styles.menuImage} />
+      <TouchableOpacity
+        style={styles.menuButton}
+        onPress={onPress}
+        activeOpacity={0.7}
+      >
+        <Icon width={48} height={48} />
       </TouchableOpacity>
       <Text style={styles.menuText}>{title}</Text>
     </View>
@@ -52,23 +66,33 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  appName: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: 40, // space between app name and buttons
+    marginTop: 32,    // space from the top of the screen
+    color: '#222',    // optional: makes the text a bit darker
+    letterSpacing: 1, // optional: adds a little spacing between letters
+  },
   buttonRow: {
     flexDirection: 'row',
-    gap: 24,
+    gap: 16,
   },
   menuButtonContainer: {
     alignItems: 'center',
     width: 100,
   },
   menuButton: {
-    width: 100,
-    height: 100,
-    backgroundColor: '#e0e0e0',
+    backgroundColor: '#f0f0f0',
     borderRadius: 16,
-    justifyContent: 'center',
+    padding: 16,
     alignItems: 'center',
-    marginBottom: 8,
-    elevation: 2,
+    justifyContent: 'center',
+    elevation: 3, // Android shadow
+    shadowColor: '#000', // iOS shadow
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
   menuImage: {
     width: 60,
@@ -79,5 +103,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: '600',
     fontSize: 14,
+    marginTop: 10,
   },
 });
