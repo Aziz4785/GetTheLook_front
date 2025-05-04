@@ -11,29 +11,26 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.appName}>Get The Look</Text>
-      <View style={styles.buttonRow}>
-        <MenuButton
-          title="Find a Complement"
-          Icon={TshirtIcon}
-          onPress={() => {
-            // handle navigation or action
-            router.push('/(tabs)/find-complement')
-          }}
-        />
-        <MenuButton
-          title="Wardrobe Wizard"
-          Icon={HangerIcon}
-          onPress={() => {
-            // handle navigation or action
-          }}
-        />
-        <MenuButton
-          title="Smart Search"
-          Icon={SearchIcon}
-          onPress={() => {
-            // handle navigation or action
-          }}
-        />
+      <View style={styles.centeredRowWrapper}>
+        <View style={styles.buttonRow}>
+          <MenuButton
+            title="Find a Complement"
+            Icon={TshirtIcon}
+            onPress={() => {
+              router.push('/(tabs)/find-complement')
+            }}
+          />
+          <MenuButton
+            title="Wardrobe Wizard"
+            Icon={HangerIcon}
+            onPress={() => {}}
+          />
+          <MenuButton
+            title="Smart Search"
+            Icon={SearchIcon}
+            onPress={() => {}}
+          />
+        </View>
       </View>
     </View>
   );
@@ -63,16 +60,22 @@ function MenuButton({ title, Icon, onPress }: MenuButtonProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
   },
   appName: {
     fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 40, // space between app name and buttons
-    marginTop: 32,    // space from the top of the screen
-    color: '#222',    // optional: makes the text a bit darker
-    letterSpacing: 1, // optional: adds a little spacing between letters
+    marginTop: 100,
+    marginBottom: 0,
+    color: '#222',
+    letterSpacing: 1,
+  },
+  centeredRowWrapper: {
+    flex: 1,
+    justifyContent: 'flex-start',
+    marginTop: '60%', // This pushes the buttonRow down to 40% of the available height
+    alignItems: 'center',
+    width: '100%',
   },
   buttonRow: {
     flexDirection: 'row',

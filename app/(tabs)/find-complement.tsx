@@ -45,49 +45,60 @@ export default function FindComplementScreen() {
     // Request permissions
     const { status: cameraStatus } = await ImagePicker.requestCameraPermissionsAsync();
     const { status: libraryStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-
+  
     if (cameraStatus !== 'granted' || libraryStatus !== 'granted') {
       Alert.alert('Permissions required', 'Camera and media library permissions are needed to select images.');
       return;
     }
-
-    // Ask user to choose source
+  
+    // Show instruction first
     Alert.alert(
-      "Select Image Source",
-      "Choose an option",
+      "Photo Guidelines",
+      "To get the best results:\n\n• Use natural or neutral lighting (well-lit room)\n• Choose a plain, neutral background\n• Make sure the garment is clearly visible with no objects on top",
       [
         {
-          text: "Camera",
-          onPress: async () => {
-            let result = await ImagePicker.launchCameraAsync({
-              allowsEditing: true,
-              aspect: [1, 1], // Keep it square
-              quality: 1,
-            });
-
-            if (!result.canceled) {
-              setImages(prev => ({ ...prev, [item]: result.assets[0].uri }));
-            }
+          text: "OK",
+          onPress: () => {
+            // After user acknowledges, prompt to choose source
+            Alert.alert(
+              "Select Image Source",
+              "Choose an option",
+              [
+                {
+                  text: "Camera",
+                  onPress: async () => {
+                    let result = await ImagePicker.launchCameraAsync({
+                      allowsEditing: true,
+                      aspect: [1, 1],
+                      quality: 1,
+                    });
+                    if (!result.canceled) {
+                      setImages(prev => ({ ...prev, [item]: result.assets[0].uri }));
+                    }
+                  },
+                },
+                {
+                  text: "Gallery",
+                  onPress: async () => {
+                    let result = await ImagePicker.launchImageLibraryAsync({
+                      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                      allowsEditing: true,
+                      aspect: [1, 1],
+                      quality: 1,
+                    });
+                    if (!result.canceled) {
+                      setImages(prev => ({ ...prev, [item]: result.assets[0].uri }));
+                    }
+                  },
+                },
+                {
+                  text: "Cancel",
+                  style: "cancel",
+                },
+              ],
+              { cancelable: true }
+            );
           },
-        },
-        {
-          text: "Gallery",
-          onPress: async () => {
-             let result = await ImagePicker.launchImageLibraryAsync({
-              mediaTypes: ImagePicker.MediaTypeOptions.Images,
-              allowsEditing: true,
-              aspect: [1, 1], // Keep it square
-              quality: 1,
-            });
-
-            if (!result.canceled) {
-                setImages(prev => ({ ...prev, [item]: result.assets[0].uri }));
-            }
-          },
-        },
-        {
-          text: "Cancel",
-          style: "cancel",
         },
       ],
       { cancelable: true }
