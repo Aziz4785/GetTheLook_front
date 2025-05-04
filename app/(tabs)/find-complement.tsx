@@ -1,5 +1,6 @@
 import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
+import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Alert, Button, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 // Comments mapping item types to suggested SVG names (from previous context)
@@ -31,6 +32,7 @@ const itemIcons: Record<ClothingItem, React.ComponentType<any>> = {
 type ClothingItem = keyof ClothingImages;
 
 export default function FindComplementScreen() {
+  const router = useRouter();
   const [selectedItem, setSelectedItem] = useState('top');  //React Hooks must be used in the top level of the component
   const [images, setImages] = useState<ClothingImages>({
     top: null,
@@ -165,7 +167,15 @@ export default function FindComplementScreen() {
       const data = await response.json();
       console.log('Server response:', data);
   
-      Alert.alert('Recommendations', JSON.stringify(data.recommendations, null, 2));
+      if (data.recommendations && data.recommendations.length > 0) {
+        // Navigate to recommendations page with the data
+        router.push({
+          pathname: '/recommendations',
+          params: { recommendations: JSON.stringify(data.recommendations) }
+        });
+      } else {
+        Alert.alert('No Recommendations', 'No matching items were found.');
+      }
     } catch (error) {
       console.error('Error sending request:', error);
       Alert.alert('Error', 'Failed to send request to the server.');
@@ -344,7 +354,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   selectionContainer: {
-    marginBottom: 20,
+    marginBottom: 5,
     paddingHorizontal: 10,
   },
   squareContainer: {
