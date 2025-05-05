@@ -50,6 +50,14 @@ export default function TabLayout() {
           title: 'Find Complement',
         }}
       />
+      <Tabs.Screen
+        name="recommendations"
+        options={{
+          title: 'recommendations',
+          tabBarButton: () => null,
+          
+        }}
+      />
     </Tabs>
   );
 }
