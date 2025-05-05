@@ -2,7 +2,7 @@ import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { Alert, Button, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Button, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 // Comments mapping item types to suggested SVG names (from previous context)
 // Top: tshirt.svg
 // Trousers: pants.svg
@@ -34,6 +34,7 @@ type ClothingItem = keyof ClothingImages;
 export default function FindComplementScreen() {
   const router = useRouter();
   const [selectedItem, setSelectedItem] = useState('top');  //React Hooks must be used in the top level of the component
+  const [loading, setLoading] = useState(false);
   const [images, setImages] = useState<ClothingImages>({
     top: null,
     trousers: null,
@@ -157,6 +158,9 @@ export default function FindComplementScreen() {
     //Add selectedItem to the formData
     formData.append('target', selectedItem);
     console.log('Form Data:', formData);
+    
+    setLoading(true);
+    
     try {
       console.log('Sending request...');
       const response = await fetch('http://192.168.1.10:8000/recommend', {
@@ -179,6 +183,8 @@ export default function FindComplementScreen() {
     } catch (error) {
       console.error('Error sending request:', error);
       Alert.alert('Error', 'Failed to send request to the server.');
+    } finally {
+      setLoading(false);
     }
   };
   // Determine which items have already been selected (uploaded)
@@ -293,6 +299,13 @@ export default function FindComplementScreen() {
           </View>
         </View>
       </ScrollView>
+      
+      {loading && (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#0000ff" />
+          <Text style={styles.loadingText}>Finding recommendations...</Text>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -386,5 +399,20 @@ const styles = StyleSheet.create({
   
   disabledLabel: {
     color: '#999',
+  },
+  loadingContainer: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 1)',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    fontWeight: '500',
   },
 });
