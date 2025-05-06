@@ -143,6 +143,13 @@ export default function FindComplementScreen() {
   //   Alert.alert('Submitted', 'Images submitted successfully.');
   // };
   const handleSubmit = async () => {
+    // Check if at least one image is uploaded
+    const hasAnyImage = Object.values(images).some(value => value !== null);
+    if (!hasAnyImage) {
+      Alert.alert('Almost there!', 'Please upload at least one image before submitting.');
+      return;
+    }
+
     const formData = new FormData();
   
     // Add each image except the selected one
@@ -164,6 +171,7 @@ export default function FindComplementScreen() {
     try {
       console.log('Sending request...');
       const response = await fetch('http://192.168.1.10:8000/recommend', {
+      //const response = await fetch('https://getthelook-server.onrender.com/recommend', {
         method: 'POST',
         body: formData, // Only this
       });
