@@ -278,7 +278,7 @@ export default function FindComplementScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <View> 
-          <Text style={styles.title}>Select the Items you have :</Text>
+          <Text style={styles.title}>Which items do you have?</Text>
 
           <View style={styles.grid}>
             {renderItemSquare('top', 'Top', selectedCategoryCount >= 2 && !categorySelected.top)}
@@ -289,7 +289,7 @@ export default function FindComplementScreen() {
             <View style={styles.squareInvisible} />
           </View>
 
-          <Text style={styles.title}>Select the item you are looking for :</Text>
+          <Text style={styles.title}>What are you looking for?</Text>
 
           <View style={styles.selectionContainer}>
           <Picker
