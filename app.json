@@ -37,6 +37,13 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "40b820c6-0cac-4861-9ce4-3f8d69d0cd4b"
+      }
+    },
+    "owner": "azizkanoun"
   }
 }

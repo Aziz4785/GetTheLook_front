@@ -375,6 +375,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   selectionContainer: {
+    marginTop: -5,
     marginBottom: 5,
     paddingHorizontal: 10,
   },
