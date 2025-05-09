@@ -1,6 +1,36 @@
-{
-  "expo": {
-    "name": "getTheLook_front",
+const IS_DEV = process.env.APP_VARIANT === 'development';
+const IS_PREVIEW = process.env.APP_VARIANT === 'preview';
+
+console.log("APP_VARIANT =", process.env.APP_VARIANT); //  Debug log
+
+const getUniqueIdentifier = () => {
+    if (IS_DEV) {
+      return 'com.azizkanoun.getthelook.dev';
+    }
+  
+    if (IS_PREVIEW) {
+      return 'com.azizkanoun.getthelook.preview';
+    }
+  
+    return 'com.azizkanoun.getthelook';
+  };
+  
+const getAppName = () => {
+    if (IS_DEV) {
+        return 'Get The Look (Dev)';
+    }
+
+    if (IS_PREVIEW) {
+        return 'Get The Look (Preview)';
+    }
+
+    return 'Get The Look';
+};
+
+  
+export default ({ config }) => ({
+    ...config,
+    "name": getAppName(),
     "slug": "getTheLook_front",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -10,7 +40,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.azizkanoun.getthelook",
+      "bundleIdentifier": getUniqueIdentifier(),
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -49,5 +79,6 @@
       }
     },
     "owner": "azizkanoun"
-  }
-}
+
+  });
+  
