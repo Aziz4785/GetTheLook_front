@@ -57,8 +57,8 @@ export default function FindComplementScreen() {
   
     // Show instruction first
     Alert.alert(
-      "Photo Guidelines",
-      "To get the best results:\n\n• Use natural or neutral lighting (well-lit room)\n• Choose a plain, neutral background\n• Make sure the garment is clearly visible with no objects on top",
+      "For best results:",
+      "• Take your photo in a well-lit area (natural light is great!)\n• Use a plain, light or white background\n• Make sure the garment is fully visible with nothing covering it",
       [
         {
           text: "OK",
