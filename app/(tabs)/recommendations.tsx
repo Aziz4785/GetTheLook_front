@@ -5,6 +5,7 @@ import { Image, Linking, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOp
 interface Recommendation {
   img_url: string;
   link: string;
+  brand: string;
 }
 
 export default function RecommendationsScreen() {
@@ -46,6 +47,7 @@ export default function RecommendationsScreen() {
                   style={styles.productImage} 
                   resizeMode="cover"
                 />
+                <Text style={styles.brandText}>{item.brand}</Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -91,7 +93,13 @@ const styles = StyleSheet.create({
   },
   productImage: {
     width: '100%',
-    height: '100%',
+    height: '85%',
+  },
+  brandText: {
+    padding: 8,
+    fontSize: 14,
+    textAlign: 'center',
+    color: '#333',
   },
   noResults: {
     textAlign: 'center',
