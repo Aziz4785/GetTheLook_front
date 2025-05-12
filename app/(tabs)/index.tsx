@@ -24,11 +24,13 @@ export default function HomeScreen() {
             title="Wardrobe Wizard"
             Icon={HangerIcon}
             onPress={() => {}}
+            comingSoon
           />
           <MenuButton
             title="Smart Search"
             Icon={SearchIcon}
             onPress={() => {}}
+            comingSoon
           />
         </View>
       </View>
@@ -40,18 +42,22 @@ type MenuButtonProps = {
   title: string;
   Icon: React.FC<SvgProps>;
   onPress: () => void;
+  comingSoon?: boolean;
 };
 
-function MenuButton({ title, Icon, onPress }: MenuButtonProps) {
+function MenuButton({ title, Icon, onPress, comingSoon }: MenuButtonProps) {
   return (
     <View style={styles.menuButtonContainer}>
-      <TouchableOpacity
-        style={styles.menuButton}
-        onPress={onPress}
-        activeOpacity={0.7}
-      >
-        <Icon width={48} height={48} />
-      </TouchableOpacity>
+      <View style={styles.menuButtonWrapper}>
+        {comingSoon && <Text style={styles.comingSoonText}>Coming Soon</Text>}
+        <TouchableOpacity
+          style={styles.menuButton}
+          onPress={onPress}
+          activeOpacity={0.7}
+        >
+          <Icon width={48} height={48} />
+        </TouchableOpacity>
+      </View>
       <Text style={styles.menuText}>{title}</Text>
     </View>
   );
@@ -85,6 +91,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: 100,
   },
+  menuButtonWrapper: {
+    position: 'relative',
+  },
   menuButton: {
     backgroundColor: '#f0f0f0',
     borderRadius: 16,
@@ -107,5 +116,18 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontSize: 14,
     marginTop: 10,
+  },
+  comingSoonText: {
+    position: 'absolute',
+    top: -8,
+    right: -8,
+    backgroundColor: '#666',
+    color: 'white',
+    fontSize: 10,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 10,
+    zIndex: 1,
+    overflow: 'hidden',
   },
 });
