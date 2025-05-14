@@ -344,7 +344,7 @@ export default function FindComplementScreen() {
       
       {loading && (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#0000ff" />
+          <ActivityIndicator size="large" color="rgb(100, 13, 20)" />
           <Text style={styles.loadingText}>Finding recommendations...</Text>
         </View>
       )}
