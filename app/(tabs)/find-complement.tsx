@@ -9,11 +9,13 @@ import { ActivityIndicator, Alert, Button, Image, SafeAreaView, ScrollView, Styl
 // Shorts: shorts.svg
 // Skirt: skirt.svg
 // Shoes: shoes.svg
+import MenIcon from '../../assets/icons/men.svg';
 import PantsIcon from '../../assets/icons/pants.svg';
 import ShoesIcon from '../../assets/icons/shoes.svg';
 import ShortsIcon from '../../assets/icons/shorts.svg';
 import SkirtIcon from '../../assets/icons/skirt.svg';
 import TshirtIcon from '../../assets/icons/tshirt.svg';
+import WomenIcon from '../../assets/icons/women.svg';
 // Interface for the image state
 interface ClothingImages {
   top: string | null;
@@ -35,6 +37,7 @@ export default function FindComplementScreen() {
   const router = useRouter();
   const [selectedItem, setSelectedItem] = useState('top');  //React Hooks must be used in the top level of the component
   const [loading, setLoading] = useState(false);
+  const [gender, setGender] = useState<string | null>(null);
   const [images, setImages] = useState<ClothingImages>({
     top: null,
     trousers: null,
@@ -149,7 +152,10 @@ export default function FindComplementScreen() {
       Alert.alert('Almost there!', 'Please upload at least one image before submitting.');
       return;
     }
-
+    if (!gender) {
+      Alert.alert('Gender Required', 'Please select a gender before submitting.');
+      return;
+    }
     const formData = new FormData();
   
     // Add each image except the selected one
@@ -164,6 +170,7 @@ export default function FindComplementScreen() {
     });
     //Add selectedItem to the formData
     formData.append('target', selectedItem);
+    formData.append('gender', gender);
     //console.log('Form Data:', formData);
     
     setLoading(true);
@@ -240,6 +247,28 @@ export default function FindComplementScreen() {
     }
   }, [availableOptions, selectedItem]);
 
+  const renderGenderSquare = (label: string, value: string) => {
+    // Choose the correct icon
+    const IconComponent = value === 'men' ? MenIcon : WomenIcon;
+    return (
+      <View style={styles.squareContainer}>
+        <TouchableOpacity
+          style={[
+            styles.square,
+            gender === value && { borderColor: 'rgb(100, 13, 20)', borderWidth: 2 },
+            { width: 100, height: 100, marginHorizontal: 10 }
+          ]}
+          onPress={() => setGender(value)}
+        >
+          {IconComponent && <IconComponent width={48} height={48} fill={gender === value ? 'rgb(100, 13, 20)' : '#555'} />}
+        </TouchableOpacity>
+        <Text style={[styles.label, { textAlign: 'center', marginTop: 6 }]}>
+          {label}
+        </Text>
+      </View>
+    );
+  };
+
   // Helper to render each square item
   const renderItemSquare = (item: ClothingItem, label: string, disabled: boolean = false) => {
     const IconComponent = itemIcons[item];
@@ -302,6 +331,11 @@ export default function FindComplementScreen() {
           </Picker>
           </View>
 
+          <Text style={styles.title}>For : </Text>
+          <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 30 }}>
+            {renderGenderSquare('Men', 'men')}
+            {renderGenderSquare('Women', 'women')}
+          </View>
           <View style={styles.buttonContainer}>
             <Button title="Submit" onPress={handleSubmit} />
           </View>
@@ -325,6 +359,7 @@ const styles = StyleSheet.create({
   scrollContentContainer: {
     flexGrow: 1,
     padding: 20,
+    paddingBottom: 100,
     justifyContent: 'space-between',
   },
   title: {
@@ -375,7 +410,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   selectionContainer: {
-    marginTop: -5,
+    marginTop: -10,
     marginBottom: 5,
     paddingHorizontal: 10,
   },
