@@ -36,7 +36,7 @@ export default ({ config }) => ({
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "getthelookfront",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
