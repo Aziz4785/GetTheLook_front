@@ -164,20 +164,20 @@ export default function FindComplementScreen() {
     });
     //Add selectedItem to the formData
     formData.append('target', selectedItem);
-    console.log('Form Data:', formData);
+    //console.log('Form Data:', formData);
     
     setLoading(true);
     
     try {
       console.log('Sending request...');
-      const response = await fetch('http://192.168.1.10:8000/recommend', {
-      //const response = await fetch('https://getthelook-server.onrender.com/recommend', {
+      //const response = await fetch('http://192.168.1.10:8000/recommend', {
+      const response = await fetch('https://getthelook-server.onrender.com/recommend', {
         method: 'POST',
         body: formData, // Only this
       });
       console.log('Request sent, awaiting response...');
       const data = await response.json();
-      console.log('Server response:', data);
+      //console.log('Server response:', data);
   
       if (data.recommendations && data.recommendations.length > 0) {
         // Navigate to recommendations page with the data

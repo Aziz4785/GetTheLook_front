@@ -10,7 +10,7 @@ export default function HomeScreen() {
   const router = useRouter();
   return (
     <View style={styles.container}>
-      <Text style={styles.appName}>Get The Look</Text>
+      <Text style={styles.appName}>ENSEMBL</Text>
       <View style={styles.centeredRowWrapper}>
         <View style={styles.buttonRow}>
           <MenuButton

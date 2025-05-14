@@ -17,14 +17,14 @@ const getUniqueIdentifier = () => {
   
 const getAppName = () => {
     if (IS_DEV) {
-        return 'Get The Look (Dev)';
+        return 'ENSEMBL (Dev)';
     }
 
     if (IS_PREVIEW) {
-        return 'Get The Look (Preview)';
+        return 'ENSEMBL (Preview)';
     }
 
-    return 'Get The Look';
+    return 'ENSEMBL';
 };
 
   
