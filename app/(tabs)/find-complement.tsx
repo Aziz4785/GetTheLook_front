@@ -3,6 +3,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Button, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { log } from '../../utils/logger';
 // Comments mapping item types to suggested SVG names (from previous context)
 // Top: tshirt.svg
 // Trousers: pants.svg
@@ -118,26 +119,26 @@ export default function FindComplementScreen() {
   //   const request: Record<string, string> = {};
     
   //   //print selectedItem
-  //   console.log('Selected Target Item:', selectedItem);
+  //   log('Selected Target Item:', selectedItem);
     
   //   // Add all uploaded images except the selected item
   //   Object.entries(images).forEach(([key, value]) => {
-  //     console.log(`Checking image: key=${key}, value=${value ? '[exists]' : 'null/undefined'}`);
+  //     log(`Checking image: key=${key}, value=${value ? '[exists]' : 'null/undefined'}`);
   //     if (value && key !== selectedItem) {
-  //       console.log(`--> Added to request: key=${key}`);
+  //       log(`--> Added to request: key=${key}`);
   //       request[key] = value;
   //     }
   //     else{
-  //       console.log(`--> Skipped: key=${key}`);
+  //       log(`--> Skipped: key=${key}`);
   //     }
   //   });
-  //   console.log('=== SUBMISSION DEBUG ===');
-  //   console.log('Selected Target Item:', selectedItem);
-  //   console.log('Filtered Input Images:', request);
-  //   console.log('Raw Images Object:', images);
-  //   console.log('========================');
+  //   log('=== SUBMISSION DEBUG ===');
+  //   log('Selected Target Item:', selectedItem);
+  //   log('Filtered Input Images:', request);
+  //   log('Raw Images Object:', images);
+  //   log('========================');
   //   // Log the request for debugging
-  //   console.log('Request:', {
+  //   log('Request:', {
   //     target: selectedItem,
   //     inputs: request
   //   });
@@ -171,20 +172,20 @@ export default function FindComplementScreen() {
     //Add selectedItem to the formData
     formData.append('target', selectedItem);
     formData.append('gender', gender);
-    //console.log('Form Data:', formData);
+    //log('Form Data:', formData);
     
     setLoading(true);
     
     try {
-      console.log('Sending request...');
+      log('Sending request...');
       //const response = await fetch('http://192.168.1.10:8000/recommend', {
       const response = await fetch('https://getthelook-server.onrender.com/recommend', {
         method: 'POST',
         body: formData, // Only this
       });
-      console.log('Request sent, awaiting response...');
+      log('Request sent, awaiting response...');
       const data = await response.json();
-      //console.log('Server response:', data);
+      //log('Server response:', data);
   
       if (data.recommendations && data.recommendations.length > 0) {
         // Navigate to recommendations page with the data
