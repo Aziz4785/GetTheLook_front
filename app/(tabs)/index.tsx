@@ -11,6 +11,9 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.appName}>ENSEMBL</Text>
+      <Text style={styles.betaSubtitle}>
+      This is a beta version. The model isn't perfect yet, but we're working hard to improve it regularly.
+      </Text>
       <View style={styles.centeredRowWrapper}>
         <View style={styles.buttonRow}>
           <MenuButton
@@ -75,6 +78,14 @@ const styles = StyleSheet.create({
     marginBottom: 0,
     color: 'rgb(100,13,20)',
     letterSpacing: 4,
+  },
+  betaSubtitle: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 8,
+    marginBottom: 0,
+    textAlign: 'center',
+    maxWidth: 320,
   },
   centeredRowWrapper: {
     flex: 1,
