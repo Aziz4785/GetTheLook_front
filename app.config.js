@@ -43,8 +43,8 @@ export default ({ config }) => ({
       "bundleIdentifier": getUniqueIdentifier(),
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
-        "NSCameraUsageDescription": "This app needs access to your camera to take photos of clothing.",
-        "NSPhotoLibraryUsageDescription": "This app needs access to your photo library to choose images."
+        "NSCameraUsageDescription": "ENSEMBL uses your camera to let you take photos of your clothes and get outfit suggestions.",
+        "NSPhotoLibraryUsageDescription": "ENSEMBL uses your photo library so you can upload images of your garments to complete your look."
       }
     },
     "android": {
