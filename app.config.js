@@ -78,8 +78,8 @@ export default ({ config }) => ({
       [
         "expo-camera",
         {
-          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
-          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
+          "cameraPermission": "$(PRODUCT_NAME) uses the camera to let you take photos of your clothes so we can suggest matching outfit pieces.",
+          "microphonePermission": "$(PRODUCT_NAME) uses the microphone only if you record audio, which is not required for most features.",
           "recordAudioAndroid": false
         }
       ],
