@@ -45,7 +45,7 @@ export default function RecommendationsScreen() {
                 <Image 
                   source={{ uri: item.img_url }} 
                   style={styles.productImage} 
-                  resizeMode="cover"
+                  resizeMode="contain"
                 />
                 <Text style={styles.brandText}>{item.brand}</Text>
               </TouchableOpacity>
