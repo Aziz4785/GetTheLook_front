@@ -77,7 +77,7 @@ export default function FindComplementScreen() {
                   onPress: async () => {
                     let result = await ImagePicker.launchCameraAsync({
                       allowsEditing: true,
-                      aspect: [1, 1],
+                      //aspect: [1, 1],
                       quality: 1,
                     });
                     if (!result.canceled) {
@@ -90,8 +90,8 @@ export default function FindComplementScreen() {
                   onPress: async () => {
                     let result = await ImagePicker.launchImageLibraryAsync({
                       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-                      allowsEditing: true,
-                      aspect: [1, 1],
+                      allowsEditing: false,
+                      //aspect: [1, 1],
                       quality: 1,
                     });
                     if (!result.canceled) {
