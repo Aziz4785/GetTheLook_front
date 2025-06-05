@@ -1,8 +1,7 @@
-import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Button, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { log } from '../../utils/logger';
 // Comments mapping item types to suggested SVG names (from previous context)
 // Top: tshirt.svg
@@ -113,39 +112,6 @@ export default function FindComplementScreen() {
     );
   };
 
-  // Function to handle submission
-  // const handleSubmit = () => {
-  //   // Create the request object
-  //   const request: Record<string, string> = {};
-    
-  //   //print selectedItem
-  //   log('Selected Target Item:', selectedItem);
-    
-  //   // Add all uploaded images except the selected item
-  //   Object.entries(images).forEach(([key, value]) => {
-  //     log(`Checking image: key=${key}, value=${value ? '[exists]' : 'null/undefined'}`);
-  //     if (value && key !== selectedItem) {
-  //       log(`--> Added to request: key=${key}`);
-  //       request[key] = value;
-  //     }
-  //     else{
-  //       log(`--> Skipped: key=${key}`);
-  //     }
-  //   });
-  //   log('=== SUBMISSION DEBUG ===');
-  //   log('Selected Target Item:', selectedItem);
-  //   log('Filtered Input Images:', request);
-  //   log('Raw Images Object:', images);
-  //   log('========================');
-  //   // Log the request for debugging
-  //   log('Request:', {
-  //     target: selectedItem,
-  //     inputs: request
-  //   });
-
-  //   // Add your submission logic here (e.g., send to backend)
-  //   Alert.alert('Submitted', 'Images submitted successfully.');
-  // };
   const handleSubmit = async () => {
     // Check if at least one image is uploaded
     const hasAnyImage = Object.values(images).some(value => value !== null);
@@ -251,19 +217,29 @@ export default function FindComplementScreen() {
   const renderGenderSquare = (label: string, value: string) => {
     // Choose the correct icon
     const IconComponent = value === 'men' ? MenIcon : WomenIcon;
+    const isSelected = gender === value;
+    
     return (
-      <View style={styles.squareContainer}>
+      <View style={styles.genderContainer}>
         <TouchableOpacity
           style={[
-            styles.square,
-            gender === value && { borderColor: 'rgb(100, 13, 20)', borderWidth: 2 },
-            { width: 100, height: 100, marginHorizontal: 10 }
+            styles.genderSquare,
+            isSelected && styles.genderSquareSelected
           ]}
           onPress={() => setGender(value)}
         >
-          {IconComponent && <IconComponent width={48} height={48} fill={gender === value ? 'rgb(100, 13, 20)' : '#555'} />}
+          {IconComponent && (
+            <IconComponent 
+              width={40} 
+              height={40} 
+              fill={isSelected ? '#fff' : 'rgb(100, 13, 20)'} 
+            />
+          )}
         </TouchableOpacity>
-        <Text style={[styles.label, { textAlign: 'center', marginTop: 6 }]}>
+        <Text style={[
+          styles.genderLabel,
+          isSelected && styles.genderLabelSelected
+        ]}>
           {label}
         </Text>
       </View>
@@ -273,16 +249,22 @@ export default function FindComplementScreen() {
   // Helper to render each square item
   const renderItemSquare = (item: ClothingItem, label: string, disabled: boolean = false) => {
     const IconComponent = itemIcons[item];
+    const hasImage = !!images[item];
+    
     return (
-      <View style={styles.squareContainer}>
+      <View style={styles.itemContainer}>
         <TouchableOpacity
-          style={[styles.square, disabled && styles.disabledSquare]}
+          style={[
+            styles.itemSquare,
+            disabled && styles.itemSquareDisabled,
+            hasImage && styles.itemSquareWithImage
+          ]}
           onPress={() => !disabled && pickImage(item)}
           disabled={disabled}
         >
-          {images[item] ? (
+          {hasImage ? (
             <>
-              <Image source={{ uri: images[item]! }} style={styles.image} resizeMode="cover" />
+              <Image source={{ uri: images[item]! }} style={styles.itemImage} resizeMode="cover" />
               <TouchableOpacity
                 style={styles.clearButton}
                 onPress={() => clearImage(item)}
@@ -291,10 +273,25 @@ export default function FindComplementScreen() {
               </TouchableOpacity>
             </>
           ) : (
-            IconComponent && <IconComponent width={48} height={48} fill={disabled ? "#999" : "#555"} />
+            <View style={styles.iconContainer}>
+              {IconComponent && (
+                <IconComponent 
+                  width={36} 
+                  height={36} 
+                  fill={disabled ? "#bbb" : "rgb(100, 13, 20)"} 
+                />
+              )}
+              <View style={styles.addIconOverlay}>
+                <Text style={[styles.addIcon, disabled && styles.addIconDisabled]}>+</Text>
+              </View>
+            </View>
           )}
         </TouchableOpacity>
-        <Text style={[styles.label, disabled && styles.disabledLabel, { textAlign: 'center', marginTop: 6 }]}>
+        <Text style={[
+          styles.itemLabel, 
+          disabled && styles.itemLabelDisabled,
+          hasImage && styles.itemLabelSelected
+        ]}>
           {label}
         </Text>
       </View>
@@ -306,47 +303,79 @@ export default function FindComplementScreen() {
       <ScrollView
         contentContainerStyle={styles.scrollContentContainer}
         keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
       >
-        <View> 
-          <Text style={styles.title}>Which items do you have?</Text>
-
-          <View style={styles.grid}>
-            {renderItemSquare('top', 'Top', selectedCategoryCount >= 2 && !categorySelected.top)}
-            {renderItemSquare('trousers', 'Trousers', categorySelected.bottom || (selectedCategoryCount >= 2 && !categorySelected.bottom))}
-            {renderItemSquare('shorts', 'Shorts', categorySelected.bottom || (selectedCategoryCount >= 2 && !categorySelected.bottom))}
-            {renderItemSquare('skirt', 'Skirt', categorySelected.bottom || (selectedCategoryCount >= 2 && !categorySelected.bottom))}
-            {renderItemSquare('shoes', 'Shoes', selectedCategoryCount >= 2 && !categorySelected.shoes)}
-            <View style={styles.squareInvisible} />
+        <View style={styles.container}> 
+          <View style={styles.headerContainer}>
+            <Text style={styles.mainTitle}>Find Your Perfect Match</Text>
+            <Text style={styles.subtitle}>Upload your items and discover complementary pieces</Text>
           </View>
 
-          <Text style={styles.title}>What are you looking for?</Text>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Which items do you have?</Text>
+            <View style={styles.grid}>
+              {renderItemSquare('top', 'Top', selectedCategoryCount >= 2 && !categorySelected.top)}
+              {renderItemSquare('trousers', 'Trousers', categorySelected.bottom || (selectedCategoryCount >= 2 && !categorySelected.bottom))}
+              {renderItemSquare('shorts', 'Shorts', categorySelected.bottom || (selectedCategoryCount >= 2 && !categorySelected.bottom))}
+              {renderItemSquare('skirt', 'Skirt', categorySelected.bottom || (selectedCategoryCount >= 2 && !categorySelected.bottom))}
+              {renderItemSquare('shoes', 'Shoes', selectedCategoryCount >= 2 && !categorySelected.shoes)}
+              <View style={styles.squareInvisible} />
+            </View>
+          </View>
 
-          <View style={styles.selectionContainer}>
-          <Picker
-            selectedValue={selectedItem}
-            onValueChange={(itemValue) => setSelectedItem(itemValue)}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>What are you looking for?</Text>
+            <View style={styles.targetItemsContainer}>
+              {availableOptions.map(option => (
+                <TouchableOpacity
+                  key={option.value}
+                  style={[
+                    styles.targetItemButton,
+                    selectedItem === option.value && styles.targetItemButtonSelected
+                  ]}
+                  onPress={() => setSelectedItem(option.value)}
+                >
+                  <Text style={[
+                    styles.targetItemText,
+                    selectedItem === option.value && styles.targetItemTextSelected
+                  ]}>
+                    {option.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>For</Text>
+            <View style={styles.genderRow}>
+              {renderGenderSquare('Men', 'men')}
+              {renderGenderSquare('Women', 'women')}
+            </View>
+          </View>
+
+          <TouchableOpacity 
+            style={[
+              styles.submitButton,
+              loading && styles.submitButtonDisabled
+            ]} 
+            onPress={handleSubmit}
+            disabled={loading}
           >
-            {availableOptions.map(option => (
-              <Picker.Item key={option.value} label={option.label} value={option.value} />
-            ))}
-          </Picker>
-          </View>
-
-          <Text style={styles.title}>For : </Text>
-          <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 30 }}>
-            {renderGenderSquare('Men', 'men')}
-            {renderGenderSquare('Women', 'women')}
-          </View>
-          <View style={styles.buttonContainer}>
-            <Button title="Submit" onPress={handleSubmit} />
-          </View>
+            <Text style={styles.submitButtonText}>
+              {loading ? 'Finding Matches...' : 'Find My Perfect Piece'}
+            </Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
       
       {loading && (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="rgb(100, 13, 20)" />
-          <Text style={styles.loadingText}>Finding recommendations...</Text>
+        <View style={styles.loadingOverlay}>
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="rgb(100, 13, 20)" />
+            <Text style={styles.loadingText}>Finding your perfect recommendations...</Text>
+            <Text style={styles.loadingSubtext}>This may take a few moments</Text>
+          </View>
         </View>
       )}
     </SafeAreaView>
@@ -356,16 +385,41 @@ export default function FindComplementScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
+    backgroundColor: '#fafafa',
   },
   scrollContentContainer: {
     flexGrow: 1,
-    padding: 20,
-    paddingBottom: 100,
-    justifyContent: 'space-between',
+    paddingBottom: 40,
   },
-  title: {
-    fontSize: 24,
+  container: {
+    flex: 1,
+    padding: 20,
+  },
+  headerContainer: {
+    alignItems: 'center',
+    marginBottom: 40,
+    paddingTop: 20,
+  },
+  mainTitle: {
+    fontSize: 28,
     fontWeight: 'bold',
+    color: 'rgb(100, 13, 20)',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    lineHeight: 22,
+  },
+  section: {
+    marginBottom: 35,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#333',
     textAlign: 'center',
     marginBottom: 20,
   },
@@ -374,56 +428,89 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 15,
-    marginBottom: 40,
+    gap: 16,
   },
-  square: {
-    width: 100,
-    height: 100,
-    backgroundColor: '#eee',
+  itemContainer: {
+    alignItems: 'center',
+  },
+  itemSquare: {
+    width: 90,
+    height: 90,
+    backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: '#e0e0e0',
     overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
-   squareInvisible: {
-    width: 100,
-    height: 100,
+  itemSquareDisabled: {
+    backgroundColor: '#f5f5f5',
+    borderColor: '#d0d0d0',
+    opacity: 0.6,
   },
-  label: {
-    fontSize: 16,
-    color: '#555',
+  itemSquareWithImage: {
+    borderColor: 'rgb(100, 13, 20)',
+    borderWidth: 2,
   },
-  image: {
+  iconContainer: {
+    position: 'relative',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  addIconOverlay: {
+    position: 'absolute',
+    bottom: -8,
+    right: -8,
+    backgroundColor: 'rgb(100, 13, 20)',
+    borderRadius: 10,
+    width: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  addIcon: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  addIconDisabled: {
+    color: '#ccc',
+  },
+  squareInvisible: {
+    width: 90,
+    height: 90,
+  },
+  itemLabel: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 8,
+    fontWeight: '500',
+  },
+  itemLabelDisabled: {
+    color: '#bbb',
+  },
+  itemLabelSelected: {
+    color: 'rgb(100, 13, 20)',
+    fontWeight: '600',
+  },
+  itemImage: {
     width: '100%',
     height: '100%',
   },
-  buttonContainer: {
-    alignItems: 'flex-end',
-  },
-  subTitle: {
-    fontSize: 18,
-    fontWeight: '500',
-    textAlign: 'center',
-    marginTop: 30,
-    marginBottom: 10,
-  },
-  selectionContainer: {
-    marginTop: -10,
-    marginBottom: 5,
-    paddingHorizontal: 10,
-  },
-  squareContainer: {
-    position: 'relative',
-  },
-  
   clearButton: {
     position: 'absolute',
-    top: 4,
-    right: 4,
-    backgroundColor: 'rgba(0,0,0,0.6)',
+    top: 6,
+    right: 6,
+    backgroundColor: 'rgba(0,0,0,0.7)',
     borderRadius: 12,
     width: 24,
     height: 24,
@@ -431,33 +518,148 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     zIndex: 1,
   },
-  
   clearButtonText: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: 12,
   },
-  disabledSquare: {
-    backgroundColor: '#ccc',
-    opacity: 0.6,
+  targetItemsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: 12,
+    paddingHorizontal: 20,
   },
-  
-  disabledLabel: {
-    color: '#999',
+  targetItemButton: {
+    backgroundColor: '#fff',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: '#e0e0e0',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
-  loadingContainer: {
+  targetItemButtonSelected: {
+    backgroundColor: 'rgb(100, 13, 20)',
+    borderColor: 'rgb(100, 13, 20)',
+  },
+  targetItemText: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#333',
+  },
+  targetItemTextSelected: {
+    color: '#fff',
+    fontWeight: '600',
+  },
+  genderRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 30,
+  },
+  genderContainer: {
+    alignItems: 'center',
+  },
+  genderSquare: {
+    width: 80,
+    height: 80,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: '#e0e0e0',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  genderSquareSelected: {
+    backgroundColor: 'rgb(100, 13, 20)',
+    borderColor: 'rgb(100, 13, 20)',
+    transform: [{ scale: 1.05 }],
+  },
+  genderLabel: {
+    fontSize: 16,
+    color: '#666',
+    marginTop: 8,
+    fontWeight: '500',
+  },
+  genderLabelSelected: {
+    color: 'rgb(100, 13, 20)',
+    fontWeight: '600',
+  },
+  submitButton: {
+    backgroundColor: 'rgb(100, 13, 20)',
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    borderRadius: 25,
+    alignItems: 'center',
+    marginTop: 20,
+    shadowColor: 'rgb(100, 13, 20)',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  submitButtonDisabled: {
+    opacity: 0.7,
+  },
+  submitButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  loadingOverlay: {
     position: 'absolute',
     left: 0,
     right: 0,
     top: 0,
     bottom: 0,
-    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 1)',
+    alignItems: 'center',
+  },
+  loadingContainer: {
+    backgroundColor: '#fff',
+    padding: 30,
+    borderRadius: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+    minWidth: 250,
   },
   loadingText: {
-    marginTop: 10,
+    marginTop: 16,
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: '600',
+    color: '#333',
+    textAlign: 'center',
+  },
+  loadingSubtext: {
+    marginTop: 4,
+    fontSize: 14,
+    color: '#666',
+    textAlign: 'center',
   },
 });
