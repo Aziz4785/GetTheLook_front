@@ -6,6 +6,7 @@ interface Recommendation {
   img_url: string;
   link: string;
   brand: string;
+  score: number;
 }
 
 export default function RecommendationsScreen() {
@@ -39,9 +40,17 @@ export default function RecommendationsScreen() {
             {recommendations.map((item, index) => (
               <TouchableOpacity 
                 key={index} 
-                style={styles.productCard}
+                style={[
+                  styles.productCard,
+                  item.score > 0.9 && styles.highlightedCard
+                ]}
                 onPress={() => openProductLink(item.link)}
               >
+                {item.score > 0.9 && (
+                  <View style={styles.recommendedBadge}>
+                    <Text style={styles.badgeText}>★</Text>
+                  </View>
+                )}
                 <Image 
                   source={{ uri: item.img_url }} 
                   style={styles.productImage} 
@@ -106,5 +115,29 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
     marginTop: 40,
+  },
+  highlightedCard: {
+    borderColor: 'rgb(100,13,20)',
+    borderWidth: 3,
+    shadowColor: 'rgb(100,13,20)',
+    shadowOpacity: 0.6,
+    shadowOffset: { width: 0, height: 0 },
+    shadowRadius: 10,
+    elevation: 8,
+  },
+  recommendedBadge: {
+    position: 'absolute',
+    top: 5,
+    right: 5,
+    backgroundColor: 'rgb(100,13,20)',
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    borderRadius: 8,
+    zIndex: 1,
+  },
+  badgeText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#fff',
   },
 });
