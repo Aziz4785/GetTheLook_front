@@ -2,6 +2,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import ImageCropModal from '../../components/ImageCropModal';
 import { log } from '../../utils/logger';
 // Comments mapping item types to suggested SVG names (from previous context)
 // Top: tshirt.svg
@@ -45,6 +46,9 @@ export default function FindComplementScreen() {
     skirt: null,
     shoes: null,
   });
+  const [croppingModalVisible, setCroppingModalVisible] = useState(false);
+  const [croppingItem, setCroppingItem] = useState<ClothingItem | null>(null);
+  const [croppingImageUri, setCroppingImageUri] = useState<string | null>(null);
 
   
   // Function to handle picking an image
@@ -75,12 +79,13 @@ export default function FindComplementScreen() {
                   text: "Camera",
                   onPress: async () => {
                     let result = await ImagePicker.launchCameraAsync({
-                      allowsEditing: true,
-                      //aspect: [1, 1],
+                      allowsEditing: false, // We'll crop manually
                       quality: 1,
                     });
                     if (!result.canceled) {
-                      setImages(prev => ({ ...prev, [item]: result.assets[0].uri }));
+                      setCroppingItem(item);
+                      setCroppingImageUri(result.assets[0].uri);
+                      setCroppingModalVisible(true);
                     }
                   },
                 },
@@ -89,12 +94,13 @@ export default function FindComplementScreen() {
                   onPress: async () => {
                     let result = await ImagePicker.launchImageLibraryAsync({
                       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-                      allowsEditing: false,
-                      //aspect: [1, 1],
+                      allowsEditing: false, // We'll crop manually
                       quality: 1,
                     });
                     if (!result.canceled) {
-                      setImages(prev => ({ ...prev, [item]: result.assets[0].uri }));
+                      setCroppingItem(item);
+                      setCroppingImageUri(result.assets[0].uri);
+                      setCroppingModalVisible(true);
                     }
                   },
                 },
@@ -363,7 +369,7 @@ export default function FindComplementScreen() {
             disabled={loading}
           >
             <Text style={styles.submitButtonText}>
-              {loading ? 'Finding Matches...' : 'Find My Perfect Piece'}
+              {loading ? 'Finding Matches...' : 'Find The Perfect Piece'}
             </Text>
           </TouchableOpacity>
         </View>
@@ -378,6 +384,23 @@ export default function FindComplementScreen() {
           </View>
         </View>
       )}
+      <ImageCropModal
+        visible={croppingModalVisible}
+        imageUri={croppingImageUri || ''}
+        onCrop={(croppedUri) => {
+          if (croppingItem) {
+            setImages(prev => ({ ...prev, [croppingItem]: croppedUri }));
+          }
+          setCroppingModalVisible(false);
+          setCroppingImageUri(null);
+          setCroppingItem(null);
+        }}
+        onCancel={() => {
+          setCroppingModalVisible(false);
+          setCroppingImageUri(null);
+          setCroppingItem(null);
+        }}
+      />
     </SafeAreaView>
   );
 }
