@@ -44,7 +44,7 @@ export default function HomeScreen() {
           style={styles.affiliateButton}
         >
           <Text style={styles.affiliateText}>
-            Disclosure
+          Legal
           </Text>
         </TouchableOpacity>
       </View>
