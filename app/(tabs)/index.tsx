@@ -37,6 +37,17 @@ export default function HomeScreen() {
           />
         </View>
       </View>
+      
+      <View style={styles.footer}>
+        <TouchableOpacity 
+          onPress={() => router.push('/(tabs)/affiliate-disclosure')}
+          style={styles.affiliateButton}
+        >
+          <Text style={styles.affiliateText}>
+            Disclosure
+          </Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -90,7 +101,7 @@ const styles = StyleSheet.create({
   centeredRowWrapper: {
     flex: 1,
     justifyContent: 'flex-start',
-    marginTop: '60%', // This pushes the buttonRow down to 40% of the available height
+    marginTop: '40%', // This pushes the buttonRow down to 40% of the available height
     alignItems: 'center',
     width: '100%',
   },
@@ -140,5 +151,22 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     zIndex: 1,
     overflow: 'hidden',
+  },
+  footer: {
+    position: 'absolute',
+    bottom: 100, // Increased to ensure visibility above tab bar
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+  },
+  affiliateButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  affiliateText: {
+    fontSize: 12,
+    color: '#666',
+    textDecorationLine: 'underline',
+    textAlign: 'center',
   },
 });

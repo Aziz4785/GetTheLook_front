@@ -44,6 +44,14 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="false-tab2"
+        options={{
+          title: 'foo2',
+          tabBarButton: () => null,
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="index"
         options={{
           title: 'Home',
@@ -64,6 +72,15 @@ export default function TabLayout() {
           title: 'recommendations',
           tabBarButton: () => null,
           
+        }}
+      />
+      <Tabs.Screen
+      
+        name="affiliate-disclosure"
+        options={{
+          // Hide the tab button
+          tabBarButton: () => null,
+          title: 'Affiliate Disclosure',
         }}
       />
     </Tabs>
