@@ -42,7 +42,7 @@ export default function RecommendationsScreen() {
                 key={index} 
                 style={[
                   styles.productCard,
-                  item.score > 0.9 && styles.highlightedCard
+                  item.score > 0.88 && styles.highlightedCard
                 ]}
                 onPress={() => openProductLink(item.link)}
               >
