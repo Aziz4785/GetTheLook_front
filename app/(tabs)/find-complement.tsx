@@ -3,7 +3,6 @@ import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import ImageCropModal from '../../components/ImageCropModal';
-import { log } from '../../utils/logger';
 // Comments mapping item types to suggested SVG names (from previous context)
 // Top: tshirt.svg
 // Trousers: pants.svg
@@ -19,11 +18,11 @@ import TshirtIcon from '../../assets/icons/tshirt.svg';
 import WomenIcon from '../../assets/icons/women.svg';
 // Interface for the image state
 interface ClothingImages {
-  top: string | null;
-  trousers: string | null;
-  shorts: string | null;
-  skirt: string | null;
-  shoes: string | null;
+  top: string[];
+  trousers: string[];
+  shorts: string[];
+  skirt: string[];
+  shoes: string[];
 }
 const itemIcons: Record<ClothingItem, React.ComponentType<any>> = {
   top: TshirtIcon,
@@ -40,11 +39,11 @@ export default function FindComplementScreen() {
   const [loading, setLoading] = useState(false);
   const [gender, setGender] = useState<string | null>(null);
   const [images, setImages] = useState<ClothingImages>({
-    top: null,
-    trousers: null,
-    shorts: null,
-    skirt: null,
-    shoes: null,
+    top: [],
+    trousers: [],
+    shorts: [],
+    skirt: [],
+    shoes: [],
   });
   const [croppingModalVisible, setCroppingModalVisible] = useState(false);
   const [croppingItem, setCroppingItem] = useState<ClothingItem | null>(null);
@@ -53,6 +52,12 @@ export default function FindComplementScreen() {
   
   // Function to handle picking an image
   const pickImage = async (item: ClothingItem) => {
+    // Check if already has 3 images
+    if (images[item].length >= 3) {
+      Alert.alert('Maximum reached', 'You can upload up to 3 images per item.');
+      return;
+    }
+
     // Request permissions
     const { status: cameraStatus } = await ImagePicker.requestCameraPermissionsAsync();
     const { status: libraryStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -120,7 +125,7 @@ export default function FindComplementScreen() {
 
   const handleSubmit = async () => {
     // Check if at least one image is uploaded
-    const hasAnyImage = Object.values(images).some(value => value !== null);
+    const hasAnyImage = Object.values(images).some(value => value.length > 0);
     if (!hasAnyImage) {
       Alert.alert('Almost there!', 'Please upload at least one image before submitting.');
       return;
@@ -131,16 +136,18 @@ export default function FindComplementScreen() {
     }
     const formData = new FormData();
   
-    // Add each image except the selected one
-    Object.entries(images).forEach(([key, value]) => {
-      if (value && key !== selectedItem) {
-        formData.append(key, {
-          uri: value, // use value directly, not value.uri
-          name: `${key}.png`,
-          type: 'image/png',
-        } as any); // 'as any' to satisfy TypeScript for React Native FormData
-      }
-    });
+          // Add each image except the selected one
+      Object.entries(images).forEach(([key, value]) => {
+        if (value.length > 0 && key !== selectedItem) {
+          value.forEach((imageUri: string , index: number) => {
+            formData.append(key, {
+              uri: imageUri,
+              name: `${key}_${index}.png`,
+              type: 'image/png',
+            } as any); // 'as any' to satisfy TypeScript for React Native FormData
+          });
+        }
+      });
     //Add selectedItem to the formData
     formData.append('target', selectedItem);
     formData.append('gender', gender);
@@ -150,12 +157,12 @@ export default function FindComplementScreen() {
     
     try {
       //log('Sending request...');
-      //const response = await fetch('http://192.168.1.10:8000/recommend', {
-      const response = await fetch('https://getthelook-server.onrender.com/recommend', {
+      const response = await fetch('http://192.168.1.10:8000/recommend', {
+      //const response = await fetch('https://getthelook-server.onrender.com/recommend', {
         method: 'POST',
         body: formData, // Only this
       });
-      log('Request sent, awaiting response...');
+
       const data = await response.json();
       //log('Server response:', data);
   
@@ -177,10 +184,11 @@ export default function FindComplementScreen() {
   };
   // Determine which items have already been selected (uploaded)
   const clearImage = (item: ClothingItem) => {
-    setImages((prev) => ({ ...prev, [item]: null }));
+    setImages((prev) => ({ ...prev, [item]: [] }));
   };
 
-  const uploadedItems = Object.keys(images).filter((key) => images[key as ClothingItem]);
+
+  const uploadedItems = Object.keys(images).filter((key) => images[key as ClothingItem].length > 0);
 
   // For bottom wear, if any of 'trousers', 'shorts', or 'skirt' is uploaded, exclude all three
   const hasBottom = ['trousers', 'shorts', 'skirt'].some((item) => uploadedItems.includes(item));
@@ -190,12 +198,13 @@ export default function FindComplementScreen() {
   
   // Check which categories have been selected
   const categorySelected = {
-    top: !!images['top'],
-    bottom: (['trousers', 'shorts', 'skirt'] as ClothingItem[]).some((item) => !!images[item]),
-    shoes: !!images['shoes'],
+    top: images['top'].length > 0,
+    bottom: (['trousers', 'shorts', 'skirt'] as ClothingItem[]).some((item) => images[item].length > 0),
+    shoes: images['shoes'].length > 0,
   };
   // Count how many distinct categories have been selected
   const selectedCategoryCount = Object.values(categorySelected).filter(Boolean).length;
+
 
   const availableOptions = [
     { label: 'Top', value: 'top' as ClothingItem },
@@ -255,29 +264,102 @@ export default function FindComplementScreen() {
   // Helper to render each square item
   const renderItemSquare = (item: ClothingItem, label: string, disabled: boolean = false) => {
     const IconComponent = itemIcons[item];
-    const hasImage = !!images[item];
+    const itemImages = images[item];
+    const hasImages = itemImages.length > 0;
+    //const canAddMore = itemImages.length < 3;
+    // Calculate total images by category
+    const topCategoryTotal = images.top.length;
+    const bottomCategoryTotal = images.trousers.length + images.shorts.length + images.skirt.length;
+    const shoesCategoryTotal = images.shoes.length;
     
+    // Check if any category has reached the limit of 3 images
+    const anyyCategoryAtLimit = topCategoryTotal >= 3 || bottomCategoryTotal >= 3 || shoesCategoryTotal >= 3;
+    
+    // For the current item, check if its category would exceed 3 images
+    let currentCategoryTotal = 0;
+    if (item === 'top') {
+      currentCategoryTotal = topCategoryTotal;
+    } else if (['trousers', 'shorts', 'skirt'].includes(item)) {
+      currentCategoryTotal = bottomCategoryTotal;
+    } else if (item === 'shoes') {
+      currentCategoryTotal = shoesCategoryTotal;
+    }
+    
+    // const categoriesWithImages = [
+    //   images.top.length > 0,
+    //   bottomCategoryTotal > 0, // any bottom wear has images
+    //   images.shoes.length > 0
+    // ].filter(Boolean).length;
+
+    
+    const canAddMore = (!anyyCategoryAtLimit && currentCategoryTotal < 3) &&  (selectedCategoryCount <= 1); //only one category has images.length>0;
+
+
+    const isDisabled = disabled || !canAddMore;  // reuse this twice below
+
     return (
       <View style={styles.itemContainer}>
         <TouchableOpacity
           style={[
             styles.itemSquare,
-            disabled && styles.itemSquareDisabled,
-            hasImage && styles.itemSquareWithImage
+            isDisabled && styles.itemSquareDisabled,
+            hasImages && styles.itemSquareWithImage,
           ]}
-          onPress={() => !disabled && pickImage(item)}
-          disabled={disabled}
-        >
-          {hasImage ? (
-            <>
-              <Image source={{ uri: images[item]! }} style={styles.itemImage} resizeMode="cover" />
+
+          onPress={() => {
+            if (!isDisabled) {
+              pickImage(item);
+            }
+          }}
+          disabled={isDisabled}
+    >
+          {hasImages ? (
+            <View style={styles.imageStackContainer}>
+              {/* Count badge */}
+              <View style={styles.countBadge}>
+                <Text style={styles.countBadgeText}>{itemImages.length}</Text>
+              </View>
+              
+              {/* Render stacked images with fanned effect */}
+              {itemImages.map((imageUri, index) => (
+                <View
+                key={index}
+                style={[
+                  styles.stackedImageContainer,
+                  {
+                    transform: [
+                      { translateX: index * 5 },
+                      { translateY: index * -1 },
+                      { rotate: `${(index - (itemImages.length - 1) / 2) * 6}deg` }
+                    ],
+                    zIndex: index,
+                  }
+                ]}
+              >
+                  <Image 
+                    source={{ uri: imageUri }} 
+                    style={styles.stackedImage} 
+                    resizeMode="cover" 
+                  />
+                  
+                </View>
+              ))}
+              
+              {/* Show + button if can add more */}
+              {canAddMore && (
+                <View style={styles.addMoreOverlay}>
+                  <Text style={styles.addMoreIcon}>+</Text>
+                </View>
+              )}
+              
+              {/* Clear all button */}
               <TouchableOpacity
-                style={styles.clearButton}
+                style={styles.clearButton} 
                 onPress={() => clearImage(item)}
               >
                 <Text style={styles.clearButtonText}>✕</Text>
               </TouchableOpacity>
-            </>
+            </View>
           ) : (
             <View style={styles.iconContainer}>
               {IconComponent && (
@@ -296,7 +378,7 @@ export default function FindComplementScreen() {
         <Text style={[
           styles.itemLabel, 
           disabled && styles.itemLabelDisabled,
-          hasImage && styles.itemLabelSelected
+          hasImages && styles.itemLabelSelected
         ]}>
           {label}
         </Text>
@@ -320,11 +402,17 @@ export default function FindComplementScreen() {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Which items do you have?</Text>
             <View style={styles.grid}>
-              {renderItemSquare('top', 'Top', selectedCategoryCount >= 2 && !categorySelected.top)}
-              {renderItemSquare('trousers', 'Trousers', categorySelected.bottom || (selectedCategoryCount >= 2 && !categorySelected.bottom))}
-              {renderItemSquare('shorts', 'Shorts', categorySelected.bottom || (selectedCategoryCount >= 2 && !categorySelected.bottom))}
-              {renderItemSquare('skirt', 'Skirt', categorySelected.bottom || (selectedCategoryCount >= 2 && !categorySelected.bottom))}
-              {renderItemSquare('shoes', 'Shoes', selectedCategoryCount >= 2 && !categorySelected.shoes)}
+              {/* {renderItemSquare('top', 'Top', selectedCategoryCount >= 2 && !categorySelected.top)} */}
+              {renderItemSquare('top', 'Top', (selectedCategoryCount >= 2 && !categorySelected.top) || Object.entries(images).some(([key, value]) => key !== 'top' && value.length > 1) || (images.trousers.length >=1 && images.shorts.length >=1)  || (images.trousers.length >=1 && images.skirt.length >=1) || (images.shorts.length >=1 && images.skirt.length >=1)   )}
+              {/*renderItemSquare('trousers', 'Trousers', images.shorts.length > 0 || images.skirt.length > 0 || (selectedCategoryCount >= 2 && images.trousers.length === 0))} */}
+              {renderItemSquare('trousers', 'Trousers',  (selectedCategoryCount >= 2 && images.trousers.length === 0) || Object.entries(images).some(([key, value]) => key !== 'trousers' && key !== 'shorts' && key !== 'skirt' && value.length > 1))}
+              {/* {renderItemSquare('shorts', 'Shorts', images.skirt.length > 0 || images.trousers.length > 0 || (selectedCategoryCount >= 2 && images.shorts.length === 0))} */}
+              {renderItemSquare('shorts', 'Shorts', (selectedCategoryCount >= 2 && images.shorts.length === 0) || Object.entries(images).some(([key, value]) => key !== 'shorts' && key !== 'trousers' && key !== 'skirt' && value.length > 1))}
+              {/* {renderItemSquare('skirt', 'Skirt', images.shorts.length > 0 || images.trousers.length > 0 || (selectedCategoryCount >= 2 && images.skirt.length === 0))} */}
+              {renderItemSquare('skirt', 'Skirt', (selectedCategoryCount >= 2 && images.skirt.length === 0) || Object.entries(images).some(([key, value]) => key !== 'skirt' && key !== 'trousers' && key !== 'shorts' && value.length > 1))}
+              {/* {renderItemSquare('shoes', 'Shoes', selectedCategoryCount >= 2 && !categorySelected.shoes)} */}
+              {renderItemSquare('shoes', 'Shoes', (selectedCategoryCount >= 2 && !categorySelected.shoes) || Object.entries(images).some(([key, value]) => key !== 'shoes' && value.length > 1) ||  (images.trousers.length >=1 && images.shorts.length >=1)  || (images.trousers.length >=1 && images.skirt.length >=1) || (images.shorts.length >=1 && images.skirt.length >=1) )}
+
               <View style={styles.squareInvisible} />
             </View>
           </View>
@@ -389,7 +477,10 @@ export default function FindComplementScreen() {
         imageUri={croppingImageUri || ''}
         onCrop={(croppedUri) => {
           if (croppingItem) {
-            setImages(prev => ({ ...prev, [croppingItem]: croppedUri }));
+            setImages(prev => ({ 
+              ...prev, 
+              [croppingItem]: [...prev[croppingItem], croppedUri]
+            }));
           }
           setCroppingModalVisible(false);
           setCroppingImageUri(null);
@@ -465,7 +556,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 2,
     borderColor: '#e0e0e0',
-    overflow: 'hidden',
+    overflow: 'visible',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -529,17 +620,108 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
+  imageStackContainer: {
+    width: '100%',
+    height: '100%',
+    position: 'relative',
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'visible', // Add this to prevent clipping
+  },
+  stackedImageContainer: {
+    position: 'absolute',
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  stackedImage: {
+    width: '100%',
+    height: '100%',
+  },
+  clearSingleButton: {
+    position: 'absolute',
+    top: 2,
+    right: 2,
+    backgroundColor: 'rgba(0,0,0,0.8)',
+    borderRadius: 8,
+    width: 16,
+    height: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  addMoreOverlay: {
+    position: 'absolute',
+    bottom: 2,
+    right: 2,
+    backgroundColor: 'rgb(100, 13, 20)',
+    borderRadius: 12,
+    width: 24,
+    height: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 100,
+  },
+  addMoreIcon: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  clearAllButton: {
+    position: 'absolute',
+    top: 2,
+    left: 2,
+    backgroundColor: 'rgba(255,0,0,0.9)',
+    borderRadius: 8,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    zIndex: 100,
+  },
+  clearAllButtonText: {
+    color: '#fff',
+    fontSize: 8,
+    fontWeight: 'bold',
+  },
+  countBadge: {
+    position: 'absolute',
+    top: -10, // Position so only bottom quarter shows
+    left: -10, // Position so only right quarter shows  
+    backgroundColor: 'rgb(100, 13, 20)',
+    borderRadius: 12,
+    width: 24,
+    height: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 200,
+    borderWidth: 2,
+    borderColor: '#fff',
+  },
+  countBadgeText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 12,
+  },
   clearButton: {
     position: 'absolute',
-    top: 6,
-    right: 6,
+    top: -8,
+    right: -8,
     backgroundColor: 'rgba(0,0,0,0.7)',
     borderRadius: 12,
     width: 24,
     height: 24,
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 1,
+    zIndex: 200,
   },
   clearButtonText: {
     color: '#fff',
