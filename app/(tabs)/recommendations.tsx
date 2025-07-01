@@ -46,7 +46,7 @@ export default function RecommendationsScreen() {
                 ]}
                 onPress={() => openProductLink(item.link)}
               >
-                {item.score > 0.9 && (
+                {item.score > 0.88 && (
                   <View style={styles.recommendedBadge}>
                     <Text style={styles.badgeText}>★</Text>
                   </View>
