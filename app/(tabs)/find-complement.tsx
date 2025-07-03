@@ -1,7 +1,7 @@
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Animated, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import ImageCropModal from '../../components/ImageCropModal';
 // Comments mapping item types to suggested SVG names (from previous context)
 // Top: tshirt.svg
@@ -48,6 +48,11 @@ export default function FindComplementScreen() {
   const [croppingModalVisible, setCroppingModalVisible] = useState(false);
   const [croppingItem, setCroppingItem] = useState<ClothingItem | null>(null);
   const [croppingImageUri, setCroppingImageUri] = useState<string | null>(null);
+  
+  // Loading animation states
+  const [currentTipIndex, setCurrentTipIndex] = useState(0);
+  const [fadeAnim] = useState(new Animated.Value(1));
+  const [scaleAnim] = useState(new Animated.Value(1));
 
   
   // Function to handle picking an image
@@ -157,8 +162,8 @@ export default function FindComplementScreen() {
     
     try {
       //log('Sending request...');
-      const response = await fetch('http://192.168.1.10:8000/recommend', {
-      //const response = await fetch('https://getthelook-server.onrender.com/recommend', {
+      //const response = await fetch('http://192.168.1.10:8000/recommend', {
+      const response = await fetch('https://getthelook-server.onrender.com/recommend', {
         method: 'POST',
         body: formData, // Only this
       });
@@ -386,6 +391,99 @@ export default function FindComplementScreen() {
     );
   };
 
+  // Helper function to get what user will receive
+  const getRecommendationDescription = () => {
+    const uploadedCategories = [];
+    const uploadedCounts = [];
+    
+    if (images.top.length > 0) {
+      uploadedCategories.push('tops');
+      uploadedCounts.push(`${images.top.length} top${images.top.length > 1 ? 's' : ''}`);
+    }
+    
+    const bottomItems = ['trousers', 'shorts', 'skirt'].filter(item => images[item as ClothingItem].length > 0);
+    if (bottomItems.length > 0) {
+      uploadedCategories.push('bottom wear');
+      const totalBottoms = bottomItems.reduce((sum, item) => sum + images[item as ClothingItem].length, 0);
+      uploadedCounts.push(`${totalBottoms} bottom piece${totalBottoms > 1 ? 's' : ''}`);
+    }
+    
+    if (images.shoes.length > 0) {
+      uploadedCategories.push('shoes');
+      uploadedCounts.push(`${images.shoes.length} shoe${images.shoes.length > 1 ? 's' : ''}`);
+    }
+
+    const targetItemName = selectedItem === 'trousers' ? 'trousers' : 
+                          selectedItem === 'shorts' ? 'shorts' :
+                          selectedItem === 'skirt' ? 'skirt' :
+                          selectedItem === 'top' ? 'tops' : 'shoes';
+
+    if (uploadedCounts.length === 1) {
+      return `Finding ${targetItemName} that perfectly match your ${uploadedCounts[0]}`;
+    } else if (uploadedCounts.length === 2) {
+      return `Finding ${targetItemName} that complement both your ${uploadedCounts[0]} and ${uploadedCounts[1]}`;
+    } else {
+      return `Finding ${targetItemName} that work with all your uploaded pieces`;
+    }
+  };
+
+  // Enhanced loading tips with animations
+  const loadingTips = [
+    "🎨 Analyzing colors and patterns in your images...",
+    "👗 Matching styles and aesthetics...",
+    "✨ Finding pieces that complement your taste...",
+    "🔍 Searching through thousands of options...",
+  ];
+
+  // Animate tip changes
+  useEffect(() => {
+    if (!loading) return;
+
+    const interval = setInterval(() => {
+      // Fade out
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleAnim, {
+          toValue: 0.8,
+          duration: 300,
+          useNativeDriver: true,
+        })
+      ]).start(() => {
+        // Change tip
+        setCurrentTipIndex((prevIndex) => (prevIndex + 1) % loadingTips.length);
+        
+        // Fade in
+        Animated.parallel([
+          Animated.timing(fadeAnim, {
+            toValue: 1,
+            duration: 300,
+            useNativeDriver: true,
+          }),
+          Animated.timing(scaleAnim, {
+            toValue: 1,
+            duration: 300,
+            useNativeDriver: true,
+          })
+        ]).start();
+      });
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [loading, fadeAnim, scaleAnim]);
+
+  // Reset animation values when loading starts
+  useEffect(() => {
+    if (loading) {
+      setCurrentTipIndex(0);
+      fadeAnim.setValue(1);
+      scaleAnim.setValue(1);
+    }
+  }, [loading]);
+
   return (
     <SafeAreaView style={styles.safeArea}> 
       <ScrollView
@@ -466,9 +564,48 @@ export default function FindComplementScreen() {
       {loading && (
         <View style={styles.loadingOverlay}>
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="rgb(100, 13, 20)" />
-            <Text style={styles.loadingText}>Finding your perfect recommendations...</Text>
-            <Text style={styles.loadingSubtext}>This may take a few moments</Text>
+            <View style={styles.loadingSpinnerContainer}>
+              <ActivityIndicator size="large" color="rgb(100, 13, 20)" />
+              <View style={styles.loadingRings}>
+                <View style={[styles.loadingRing, styles.loadingRing1]} />
+                <View style={[styles.loadingRing, styles.loadingRing2]} />
+              </View>
+            </View>
+            
+            <Text style={styles.loadingTitle}>AI is Working Its Magic</Text>
+            <Text style={styles.loadingDescription}>
+              {getRecommendationDescription()}
+            </Text>
+            
+            <Animated.View 
+              style={[
+                styles.loadingTipContainer,
+                {
+                  opacity: fadeAnim,
+                  transform: [{ scale: scaleAnim }]
+                }
+              ]}
+            >
+              <Text style={styles.loadingTip}>
+                {loadingTips[currentTipIndex]}
+              </Text>
+            </Animated.View>
+            
+            <View style={styles.loadingProgress}>
+              <View style={styles.progressDots}>
+                {loadingTips.map((_, index) => (
+                  <View
+                    key={index}
+                    style={[
+                      styles.progressDot,
+                      currentTipIndex === index && styles.progressDotActive
+                    ]}
+                  />
+                ))}
+              </View>
+            </View>
+            
+            <Text style={styles.loadingFooter}>This may take a few moments</Text>
           </View>
         </View>
       )}
@@ -854,17 +991,72 @@ const styles = StyleSheet.create({
     elevation: 8,
     minWidth: 250,
   },
-  loadingText: {
+  loadingSpinnerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loadingRings: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  loadingRing: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    marginHorizontal: 2,
+  },
+  loadingRing1: {
+    backgroundColor: 'rgb(100, 13, 20)',
+  },
+  loadingRing2: {
+    backgroundColor: 'rgba(100, 13, 20, 0.5)',
+  },
+  loadingTitle: {
     marginTop: 16,
     fontSize: 16,
     fontWeight: '600',
     color: '#333',
     textAlign: 'center',
   },
-  loadingSubtext: {
+  loadingDescription: {
     marginTop: 4,
     fontSize: 14,
     color: '#666',
+    textAlign: 'center',
+  },
+  loadingTipContainer: {
+    marginTop: 16,
+    marginBottom: 20,
+  },
+  loadingTip: {
+    fontSize: 14,
+    color: '#666',
+    textAlign: 'center',
+  },
+  loadingProgress: {
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  progressDots: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 4,
+  },
+  progressDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#e0e0e0',
+  },
+  progressDotActive: {
+    backgroundColor: 'rgb(100, 13, 20)',
+  },
+  loadingFooter: {
+    marginTop: 16,
+    fontSize: 12,
+    color: '#999',
     textAlign: 'center',
   },
 });
