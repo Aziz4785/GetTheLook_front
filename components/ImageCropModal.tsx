@@ -12,6 +12,8 @@ import {
   View,
 } from 'react-native';
 
+import { useTranslation } from '../hooks/useTranslation';
+
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 const CROP_SIZE = Math.min(SCREEN_WIDTH, SCREEN_HEIGHT) * 0.7;
@@ -24,6 +26,7 @@ interface ImageCropModalProps {
 }
 
 export default function ImageCropModal({ visible, imageUri, onCrop, onCancel }: ImageCropModalProps) {
+  const { t } = useTranslation();
   const [cropRect, setCropRect] = useState({
     x: (SCREEN_WIDTH - CROP_SIZE) / 2,
     y: (SCREEN_HEIGHT - CROP_SIZE) / 2.5, // A reasonable starting point
@@ -249,7 +252,7 @@ export default function ImageCropModal({ visible, imageUri, onCrop, onCancel }: 
           />
         </View>
         
-        <Text style={styles.title}>Adjust the frame to crop and isolate the selected garment</Text>
+        <Text style={styles.title}>{t('imageCropModal.adjustFrame')}</Text>
 
         <View style={styles.buttonRow}>
           <TouchableOpacity style={styles.button} onPress={onCancel} disabled={cropping}>

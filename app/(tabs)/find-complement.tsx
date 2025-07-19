@@ -3,6 +3,7 @@ import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Animated, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import ImageCropModal from '../../components/ImageCropModal';
+import { useTranslation } from '../../hooks/useTranslation';
 // Comments mapping item types to suggested SVG names (from previous context)
 // Top: tshirt.svg
 // Trousers: pants.svg
@@ -35,6 +36,7 @@ type ClothingItem = keyof ClothingImages;
 
 export default function FindComplementScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [selectedItem, setSelectedItem] = useState('top');  //React Hooks must be used in the top level of the component
   const [loading, setLoading] = useState(false);
   const [gender, setGender] = useState<string | null>(null);
@@ -59,7 +61,7 @@ export default function FindComplementScreen() {
   const pickImage = async (item: ClothingItem) => {
     // Check if already has 3 images
     if (images[item].length >= 3) {
-      Alert.alert('Maximum reached', 'You can upload up to 3 images per item.');
+      Alert.alert(t('findComplement.maximumReached'), t('findComplement.maximumReachedMessage'));
       return;
     }
 
@@ -68,25 +70,25 @@ export default function FindComplementScreen() {
     const { status: libraryStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
   
     if (cameraStatus !== 'granted' || libraryStatus !== 'granted') {
-      Alert.alert('Permissions required', 'Camera and media library permissions are needed to select images.');
+      Alert.alert(t('findComplement.permissionsRequired'), t('findComplement.permissionsRequiredMessage'));
       return;
     }
   
     // Show instruction first
     Alert.alert(
-      "For best results:",
-      "• Take your photo in a well-lit area (natural light is great!)\n• Use a plain, light or white background\n• Make sure the garment is fully visible with nothing covering it",
+      t('findComplement.forBestResults'),
+      t('findComplement.bestResultsMessage'),
       [
         {
-          text: "OK",
+          text: t('findComplement.ok'),
           onPress: () => {
             // After user acknowledges, prompt to choose source
             Alert.alert(
-              "Select Image Source",
-              "Choose an option",
+              t('findComplement.selectImageSource'),
+              t('findComplement.chooseOption'),
               [
                 {
-                  text: "Camera",
+                  text: t('findComplement.camera'),
                   onPress: async () => {
                     let result = await ImagePicker.launchCameraAsync({
                       allowsEditing: false, // We'll crop manually
@@ -100,7 +102,7 @@ export default function FindComplementScreen() {
                   },
                 },
                 {
-                  text: "Gallery",
+                  text: t('findComplement.library'),
                   onPress: async () => {
                     let result = await ImagePicker.launchImageLibraryAsync({
                       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -114,17 +116,12 @@ export default function FindComplementScreen() {
                     }
                   },
                 },
-                {
-                  text: "Cancel",
-                  style: "cancel",
-                },
-              ],
-              { cancelable: true }
+                { text: t('findComplement.cancel'), style: 'cancel' },
+              ]
             );
           },
         },
-      ],
-      { cancelable: true }
+      ]
     );
   };
 
@@ -162,8 +159,8 @@ export default function FindComplementScreen() {
     
     try {
       //log('Sending request...');
-      //const response = await fetch('http://192.168.1.10:8000/recommend', {
-      const response = await fetch('https://getthelook-server.onrender.com/recommend', {
+      const response = await fetch('http://192.168.1.10:8000/recommend', {
+      //const response = await fetch('https://getthelook-server.onrender.com/recommend', {
         method: 'POST',
         body: formData, // Only this
       });
@@ -212,11 +209,11 @@ export default function FindComplementScreen() {
 
 
   const availableOptions = [
-    { label: 'Top', value: 'top' as ClothingItem },
-    { label: 'Trousers', value: 'trousers' as ClothingItem },
-    { label: 'Shorts', value: 'shorts' as ClothingItem },
-    { label: 'Skirt', value: 'skirt' as ClothingItem },
-    { label: 'Shoes', value: 'shoes' as ClothingItem },
+    { label: t('findComplement.top'), value: 'top' as ClothingItem },
+    { label: t('findComplement.trousers'), value: 'trousers' as ClothingItem },
+    { label: t('findComplement.shorts'), value: 'shorts' as ClothingItem },
+    { label: t('findComplement.skirt'), value: 'skirt' as ClothingItem },
+    { label: t('findComplement.shoes'), value: 'shoes' as ClothingItem },
   ].filter(option => {
     const val = option.value;
     if (val === 'top') return !categorySelected.top;
@@ -429,10 +426,10 @@ export default function FindComplementScreen() {
 
   // Enhanced loading tips with animations
   const loadingTips = [
-    "🎨 Analyzing colors and patterns in your images...",
-    "👗 Matching styles and aesthetics...",
-    "✨ Finding pieces that complement your taste...",
-    "🔍 Searching through thousands of options...",
+    '🎨 ' + t('findComplement.analyzingColorsAndPatterns'),
+    '👗 ' + t('findComplement.matchingStylesAndAesthetics'),
+    '🔍 ' + t('findComplement.searchingThroughZalando'),
+    '🔍 ' + t('findComplement.searchingThroughAmazon'),
   ];
 
   // Animate tip changes
@@ -493,30 +490,31 @@ export default function FindComplementScreen() {
       >
         <View style={styles.container}> 
           <View style={styles.headerContainer}>
-            <Text style={styles.mainTitle}>Find Your Perfect Match</Text>
-            <Text style={styles.subtitle}>Upload your items and discover complementary pieces</Text>
+            <Text style={styles.mainTitle}>{t('findComplement.mainTitle')}</Text>
+            {/*<Text style={styles.subtitle}>{t('findComplement.subtitle')}</Text>*/}
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Which items do you have?</Text>
+            <Text style={styles.sectionTitle}>{t('findComplement.whichItemsHave')}</Text>
+            <Text style={styles.instructionText}>{t('findComplement.addItemsInstruction')}</Text>
             <View style={styles.grid}>
               {/* {renderItemSquare('top', 'Top', selectedCategoryCount >= 2 && !categorySelected.top)} */}
-              {renderItemSquare('top', 'Top', (selectedCategoryCount >= 2 && !categorySelected.top) || Object.entries(images).some(([key, value]) => key !== 'top' && value.length > 1) || (images.trousers.length >=1 && images.shorts.length >=1)  || (images.trousers.length >=1 && images.skirt.length >=1) || (images.shorts.length >=1 && images.skirt.length >=1)   )}
+              {renderItemSquare('top', t('findComplement.top'), (selectedCategoryCount >= 2 && !categorySelected.top) || Object.entries(images).some(([key, value]) => key !== 'top' && value.length > 1) || (images.trousers.length >=1 && images.shorts.length >=1)  || (images.trousers.length >=1 && images.skirt.length >=1) || (images.shorts.length >=1 && images.skirt.length >=1)   )}
               {/*renderItemSquare('trousers', 'Trousers', images.shorts.length > 0 || images.skirt.length > 0 || (selectedCategoryCount >= 2 && images.trousers.length === 0))} */}
-              {renderItemSquare('trousers', 'Trousers',  (selectedCategoryCount >= 2 && images.trousers.length === 0) || Object.entries(images).some(([key, value]) => key !== 'trousers' && key !== 'shorts' && key !== 'skirt' && value.length > 1))}
+              {renderItemSquare('trousers', t('findComplement.trousers'),  (selectedCategoryCount >= 2 && images.trousers.length === 0) || Object.entries(images).some(([key, value]) => key !== 'trousers' && key !== 'shorts' && key !== 'skirt' && value.length > 1))}
               {/* {renderItemSquare('shorts', 'Shorts', images.skirt.length > 0 || images.trousers.length > 0 || (selectedCategoryCount >= 2 && images.shorts.length === 0))} */}
-              {renderItemSquare('shorts', 'Shorts', (selectedCategoryCount >= 2 && images.shorts.length === 0) || Object.entries(images).some(([key, value]) => key !== 'shorts' && key !== 'trousers' && key !== 'skirt' && value.length > 1))}
+              {renderItemSquare('shorts', t('findComplement.shorts'), (selectedCategoryCount >= 2 && images.shorts.length === 0) || Object.entries(images).some(([key, value]) => key !== 'shorts' && key !== 'trousers' && key !== 'skirt' && value.length > 1))}
               {/* {renderItemSquare('skirt', 'Skirt', images.shorts.length > 0 || images.trousers.length > 0 || (selectedCategoryCount >= 2 && images.skirt.length === 0))} */}
-              {renderItemSquare('skirt', 'Skirt', (selectedCategoryCount >= 2 && images.skirt.length === 0) || Object.entries(images).some(([key, value]) => key !== 'skirt' && key !== 'trousers' && key !== 'shorts' && value.length > 1))}
+              {renderItemSquare('skirt', t('findComplement.skirt'), (selectedCategoryCount >= 2 && images.skirt.length === 0) || Object.entries(images).some(([key, value]) => key !== 'skirt' && key !== 'trousers' && key !== 'shorts' && value.length > 1))}
               {/* {renderItemSquare('shoes', 'Shoes', selectedCategoryCount >= 2 && !categorySelected.shoes)} */}
-              {renderItemSquare('shoes', 'Shoes', (selectedCategoryCount >= 2 && !categorySelected.shoes) || Object.entries(images).some(([key, value]) => key !== 'shoes' && value.length > 1) ||  (images.trousers.length >=1 && images.shorts.length >=1)  || (images.trousers.length >=1 && images.skirt.length >=1) || (images.shorts.length >=1 && images.skirt.length >=1) )}
+              {renderItemSquare('shoes', t('findComplement.shoes'), (selectedCategoryCount >= 2 && !categorySelected.shoes) || Object.entries(images).some(([key, value]) => key !== 'shoes' && value.length > 1) ||  (images.trousers.length >=1 && images.shorts.length >=1)  || (images.trousers.length >=1 && images.skirt.length >=1) || (images.shorts.length >=1 && images.skirt.length >=1) )}
 
               <View style={styles.squareInvisible} />
             </View>
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>What are you looking for?</Text>
+            <Text style={styles.sectionTitle}>{t('findComplement.whatLookingFor')}</Text>
             <View style={styles.targetItemsContainer}>
               {availableOptions.map(option => (
                 <TouchableOpacity
@@ -539,10 +537,10 @@ export default function FindComplementScreen() {
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>For</Text>
+            <Text style={styles.sectionTitle}>{t('findComplement.for')}</Text>
             <View style={styles.genderRow}>
-              {renderGenderSquare('Men', 'men')}
-              {renderGenderSquare('Women', 'women')}
+              {renderGenderSquare(t('findComplement.men'), 'men')}
+              {renderGenderSquare(t('findComplement.women'), 'women')}
             </View>
           </View>
 
@@ -555,7 +553,7 @@ export default function FindComplementScreen() {
             disabled={loading}
           >
             <Text style={styles.submitButtonText}>
-              {loading ? 'Finding Matches...' : 'Find The Perfect Piece'}
+              {loading ? t('findComplement.findingMatches') : t('findComplement.findPerfectPiece')}
             </Text>
           </TouchableOpacity>
         </View>
@@ -572,7 +570,7 @@ export default function FindComplementScreen() {
               </View>
             </View>
             
-            <Text style={styles.loadingTitle}>AI is Working Its Magic</Text>
+            {/*<Text style={styles.loadingTitle}>{t('findComplement.aiWorkingMagic')}</Text>*/}
             <Text style={styles.loadingDescription}>
               {getRecommendationDescription()}
             </Text>
@@ -673,6 +671,14 @@ const styles = StyleSheet.create({
     color: '#333',
     textAlign: 'center',
     marginBottom: 20,
+  },
+  instructionText: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: -15,
+    textAlign: 'center',
+    marginBottom: 15,
+    fontStyle: 'italic',
   },
   grid: {
     flexDirection: 'row',

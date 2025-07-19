@@ -1,0 +1,70 @@
+{
+  "app": {
+    "name": "ENSEMBL"
+  },
+  "home": {
+    "betaSubtitle": "This is a beta version. The model isn't perfect yet, but we're working hard to improve it regularly.",
+    "findComplement": "Find a Complement",
+    "wardrobeWizard": "Wardrobe Wizard",
+    "smartSearch": "Smart Search",
+    "comingSoon": "Coming Soon",
+    "legal": "Legal"
+  },
+  "findComplement": {
+    "title": "Find a Complement",
+    "mainTitle": "Complete your outfit",
+    "subtitle": "Upload your items and discover complementary pieces",
+    "whichItemsHave": "Which items do you have?",
+    "addItemsInstruction": "(up to 3 items per category)",
+    "whatLookingFor": "What do you want to buy?",
+    "for": "For :",
+    "men": "Men",
+    "women": "Women",
+    "top": "Top",
+    "trousers": "Trousers",
+    "shorts": "Shorts",
+    "skirt": "Skirt",
+    "shoes": "Shoes",
+    "findPerfectPiece": "Find The Perfect Piece",
+    "findingMatches": "Finding Matches...",
+    "aiWorkingMagic": "AI is Working Its Magic",
+    "analyzingColorsAndPatterns": "Analyzing colors and patterns...",
+    "searchingThroughZalando": "Searching through zalando.com...",
+    "searchingThroughAmazon": "Searching through amazon.com...",
+    "matchingStylesAndAesthetics": "Matching styles and aesthetics...",
+    "maximumReached": "Maximum reached",
+    "maximumReachedMessage": "You can upload up to 3 images per item.",
+    "permissionsRequired": "Permissions required",
+    "permissionsRequiredMessage": "Camera and media library permissions are needed to select images.",
+    "forBestResults": "For best results:",
+    "bestResultsMessage": "• Take your photo in a well-lit area (natural light is great!)\n• Make sure the garment is fully visible with nothing covering it",
+    "selectImageSource": "Select Image Source",
+    "chooseOption": "Choose an option",
+    "camera": "Camera",
+    "library": "Library",
+    "cancel": "Cancel",
+    "ok": "OK"
+  },
+  "recommendations": {
+    "title": "Recommended Items",
+    "noResults": "No recommendations found"
+  },
+  "affiliateDisclosure": {
+    "title": "Affiliate Disclosure",
+    "back": "← Back",
+    "amazonAssociate": "As an Amazon Associate, I earn from qualifying purchases.",
+    "affiliateLinks": "This app may contain Amazon affiliate links. When you make a purchase through these links, we may receive a small commission at no additional cost to you. This helps us maintain and improve the app.",
+    "compliance": "We are committed to complying with all applicable regulations regarding advertising, data protection, and marketing. All product recommendations are based on our algorithms and are not influenced by affiliate commissions.",
+    "legalCompliance": "Legal Compliance",
+    "legalText": "We comply with all applicable laws, ordinances, rules, regulations regarding communications, data protection, advertising and marketing."
+  },
+  "imageCropModal": {
+    "adjustFrame": "Adjust the frame to crop and isolate the selected garment"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "ok": "OK",
+    "cancel": "Cancel"
+  }
+} 

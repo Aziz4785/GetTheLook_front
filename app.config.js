@@ -42,7 +42,10 @@ export default ({ config }) => ({
       "supportsTablet": false,
       "bundleIdentifier": getUniqueIdentifier(),
       "infoPlist": {
+        "CFBundleDevelopmentRegion": "en",
+        "CFBundleLocalizations": ["en", "fr"],
         "ITSAppUsesNonExemptEncryption": false,
+        "CFBundleAllowMixedLocalizations": true,
         "NSCameraUsageDescription": "ENSEMBL needs camera access to help you create outfits. When you take photos of your clothes, we use them to analyze your style and suggest matching items that would complement your existing pieces. For example, if you take a photo of your blue shirt, we'll suggest pants and shoes that would look great with it.",
         "NSPhotoLibraryUsageDescription": "ENSEMBL needs photo library access to help you build complete outfits. When you select photos of your clothes from your library, we use them to understand your style and suggest matching items. For example, if you select a photo of your favorite jeans, we'll suggest tops and shoes that would pair well with them."
       }
@@ -83,7 +86,13 @@ export default ({ config }) => ({
           "recordAudioAndroid": false
         }
       ],
-      "expo-image-picker"
+      "expo-image-picker",
+      [
+        "expo-localization",
+        {
+          "supportedLocales": ["en", "fr"]
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

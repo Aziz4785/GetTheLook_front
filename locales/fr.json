@@ -1,0 +1,70 @@
+{
+  "app": {
+    "name": "ENSEMBL"
+  },
+  "home": {
+    "betaSubtitle": "Vous utilisez actuellement une version bêta. Le modèle n'est pas encore parfait, mais nous travaillons activement à l'améliorer chaque jour",
+    "findComplement": "Trouver un Complément",
+    "wardrobeWizard": "Assistant Garde-robe",
+    "smartSearch": "Recherche Intelligente",
+    "comingSoon": "Coming Soon",
+    "legal": "Legal"
+  },
+  "findComplement": {
+    "title": "Trouver un Complément",
+    "mainTitle": "Completez votre outfit",
+    "subtitle": "Ajoutez ici des photos de vos vêtements pour obtenir des suggestions de compléments",
+    "whichItemsHave": "Quels vêtements avez-vous déjà ?",
+    "addItemsInstruction": "(jusqu'à 3 vêtements par catégorie)",
+    "whatLookingFor": "Que souhaitez-vous acheter ?",
+    "for": "Pour :",
+    "men": "Homme",
+    "women": "Femme",
+    "top": "Haut",
+    "trousers": "Pantalon",
+    "shorts": "Short",
+    "skirt": "Jupe",
+    "shoes": "Chaussures",
+    "findPerfectPiece": "Trouver la Pièce Parfaite",
+    "findingMatches": "Recherche d'Associations...",
+    "aiWorkingMagic": "L'IA fait sa magie",
+    "analyzingColorsAndPatterns": "Analyse des couleurs et des motifs...",
+    "searchingThroughZalando": "Recherche dans zalando.com...",
+    "searchingThroughAmazon": "Recherche dans amazon.com...",
+    "matchingStylesAndAesthetics": "Recherche de correspondances de styles et d'esthétique...",
+    "maximumReached": "Maximum atteint",
+    "maximumReachedMessage": "Vous pouvez télécharger jusqu'à 3 images par article.",
+    "permissionsRequired": "Permissions requises",
+    "permissionsRequiredMessage": "Les permissions de caméra et de bibliothèque multimédia sont nécessaires pour sélectionner des images.",
+    "forBestResults": "Pour de meilleurs résultats :",
+    "bestResultsMessage": "• Prenez votre photo dans un endroit bien éclairé (de péférence en lumière naturelle)\n• Assurez-vous que le vêtement est entièrement visible sans rien qui le couvre",
+    "selectImageSource": "Sélectionner la source d'image",
+    "chooseOption": "Choisissez une option",
+    "camera": "Caméra",
+    "library": "Bibliothèque",
+    "cancel": "Annuler",
+    "ok": "OK"
+  },
+  "recommendations": {
+    "title": "Articles Recommandés",
+    "noResults": "Aucune recommandation trouvée"
+  },
+  "affiliateDisclosure": {
+    "title": "Divulgation d'Affiliation",
+    "back": "← Retour",
+    "amazonAssociate": "En tant que Partenaire Amazon, je réalise un bénéfice sur les achats remplissant les conditions requises.",
+    "affiliateLinks": "Cette application peut contenir des liens d'affiliation Amazon. Lorsque vous effectuez un achat via ces liens, nous pouvons recevoir une petite commission sans frais supplémentaires pour vous. Cela nous aide à maintenir et améliorer l'application.",
+    "compliance": "Nous nous engageons à respecter toutes les réglementations applicables en matière de publicité, de protection des données et de marketing. Toutes les recommandations de produits sont basées sur nos algorithmes et ne sont pas influencées par les commissions d'affiliation.",
+    "legalCompliance": "Conformité Légale",
+    "legalText": "Nous respectons toutes les lois, ordonnances, règles, réglementations applicables en matière de communications, protection des données, publicité et marketing."
+  },
+  "imageCropModal": {
+    "adjustFrame": "Ajustez le cadre pour recadrer et isoler le vêtement sélectionné"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "ok": "OK",
+    "cancel": "Annuler"
+  }
+} 

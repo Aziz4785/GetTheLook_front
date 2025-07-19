@@ -1,6 +1,8 @@
 import HangerIcon from '@/assets/images/hanger.svg';
 import SearchIcon from '@/assets/images/search.svg';
 import TshirtIcon from '@/assets/images/tshirt.svg';
+import { useTranslation } from '@/hooks/useTranslation';
+import * as Linking from 'expo-linking';
 import { useRouter } from 'expo-router';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SvgProps } from 'react-native-svg';
@@ -8,29 +10,36 @@ import { SvgProps } from 'react-native-svg';
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
+  const handleContactPress = () => {
+    const subject = encodeURIComponent('App feedback');
+    const body    = encodeURIComponent('\n\n——\nsent from ensembl.ai');
+    Linking.openURL(`mailto:ensembl.ai@gmail.com?subject=${subject}&body=${body}`);
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.appName}>ENSEMBL</Text>
+      <Text style={styles.appName}>{t('app.name')}</Text>
       <Text style={styles.betaSubtitle}>
-      This is a beta version. The model isn't perfect yet, but we're working hard to improve it regularly.
+        {t('home.betaSubtitle')}
       </Text>
       <View style={styles.centeredRowWrapper}>
         <View style={styles.buttonRow}>
           <MenuButton
-            title="Find a Complement"
+            title={t('home.findComplement')}
             Icon={TshirtIcon}
             onPress={() => {
               router.push('/(tabs)/find-complement')
             }}
           />
           <MenuButton
-            title="Wardrobe Wizard"
+            title={t('home.wardrobeWizard')}
             Icon={HangerIcon}
             onPress={() => {}}
             comingSoon
           />
           <MenuButton
-            title="Smart Search"
+            title={t('home.smartSearch')}
             Icon={SearchIcon}
             onPress={() => {}}
             comingSoon
@@ -41,11 +50,21 @@ export default function HomeScreen() {
       <View style={styles.footer}>
         <TouchableOpacity 
           onPress={() => router.push('/(tabs)/affiliate-disclosure')}
-          style={styles.affiliateButton}
+          style={styles.footerButton}
         >
           <Text style={styles.affiliateText}>
-          Legal
+            {t('home.legal')}
           </Text>
+        </TouchableOpacity>
+        {/* ·  middle dot separator  */}
+        <Text style={styles.footerText}>{' · '}</Text>
+
+        {/* ✉️  CONTACT  */}
+        <TouchableOpacity
+          onPress={handleContactPress}
+          style={styles.footerButton}
+        >
+          <Text style={styles.footerText}>{"contact us"}</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -60,10 +79,12 @@ type MenuButtonProps = {
 };
 
 function MenuButton({ title, Icon, onPress, comingSoon }: MenuButtonProps) {
+  const { t } = useTranslation();
+  
   return (
     <View style={styles.menuButtonContainer}>
       <View style={styles.menuButtonWrapper}>
-        {comingSoon && <Text style={styles.comingSoonText}>Coming Soon</Text>}
+        {comingSoon && <Text style={styles.comingSoonText}>{t('home.comingSoon')}</Text>}
         <TouchableOpacity
           style={styles.menuButton}
           onPress={onPress}
@@ -158,6 +179,8 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   affiliateButton: {
     paddingHorizontal: 16,
@@ -168,5 +191,13 @@ const styles = StyleSheet.create({
     color: '#666',
     textDecorationLine: 'underline',
     textAlign: 'center',
+  },
+  footerButton: {
+    padding: 4,
+  },
+  footerText: {
+    fontSize: 14,
+    color: '#6B7280',      // tailwind gray‑500-ish
+    textDecorationLine: 'underline',
   },
 });

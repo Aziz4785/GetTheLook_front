@@ -1,6 +1,7 @@
 import { useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import { Image, Linking, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useTranslation } from '../../hooks/useTranslation';
 
 interface Recommendation {
   img_url: string;
@@ -11,6 +12,7 @@ interface Recommendation {
 
 export default function RecommendationsScreen() {
   const params = useLocalSearchParams();
+  const { t } = useTranslation();
   
   // Parse recommendations from the route params
   const recommendationsParam = params.recommendations as string;
@@ -31,10 +33,10 @@ export default function RecommendationsScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.scrollContentContainer}>
-        <Text style={styles.title}>Recommended Items</Text>
+        <Text style={styles.title}>{t('recommendations.title')}</Text>
         
         {recommendations.length === 0 ? (
-          <Text style={styles.noResults}>No recommendations found</Text>
+          <Text style={styles.noResults}>{t('recommendations.noResults')}</Text>
         ) : (
           <View style={styles.grid}>
             {recommendations.map((item, index) => (
