@@ -159,8 +159,8 @@ export default function FindComplementScreen() {
     
     try {
       //log('Sending request...');
-      const response = await fetch('http://192.168.1.10:8000/recommend', {
-      //const response = await fetch('https://getthelook-server.onrender.com/recommend', {
+      //const response = await fetch('http://192.168.1.10:8000/recommend', {
+      const response = await fetch('https://getthelook-server.onrender.com/recommend', {
         method: 'POST',
         body: formData, // Only this
       });
